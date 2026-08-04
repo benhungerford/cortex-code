@@ -10,7 +10,7 @@
     {
       "name": "cortex-code",
       "source": "./",
-      "description": "Build and sign off vault tickets: implement against acceptance criteria, verify in a real browser.",
+      "description": "Write, build, and sign off vault-backed tickets: research the repo, implement against acceptance criteria, verify in a real browser.",
       "category": "engineering",
       "tags": [
         "shopify",

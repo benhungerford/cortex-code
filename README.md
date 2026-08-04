@@ -82,6 +82,10 @@ Two things fall out. A returning build session opens one file and sees the origi
 
 ## Status
 
-`0.3.0` — `build` and `qa`, written against the task/ticket model in [`docs/design/2026-08-04-task-and-ticket-model.md`](docs/design/2026-08-04-task-and-ticket-model.md). Together they cost roughly 70 tokens resident — scaled from the 66 measured at `0.2.0`, whose descriptions were 15 characters shorter in total. The bodies are free until invoked. `ticket` is not written yet.
+`1.0.0` — the roster is complete. `ticket`, `build`, and `qa`, all written against the task/ticket model in [`docs/design/2026-08-04-task-and-ticket-model.md`](docs/design/2026-08-04-task-and-ticket-model.md).
+
+Resident cost is roughly 108 tokens across the three, against the ~225 originally budgeted for five skills. The bodies — 1,776, 1,557, and 1,644 words — are free until invoked, because every skill is `disable-model-invocation: true`.
+
+Not yet written: `audit`, which reads the kept tickets after a project ends and reports where they came up short. It is deliberately post-project work.
 
 MIT.

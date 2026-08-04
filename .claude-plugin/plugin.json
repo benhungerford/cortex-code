@@ -1,7 +1,7 @@
 {
   "name": "cortex-code",
-  "description": "The build and sign-off halves of the Cortex workflow. Implements a repo ticket against its acceptance criteria, verifies the result in a real browser, and walks those criteria at sign-off \u2014 for themes and sites where a test runner does not exist.",
-  "version": "0.3.0",
+  "description": "Runs a client build workflow on two files: a task in an Obsidian vault, and a ticket in the repo. Researches and writes the ticket, implements against its criteria, and verifies in a real browser \u2014 for themes and sites where a test runner does not exist.",
+  "version": "1.0.0",
   "author": {
     "name": "Ben Hungerford"
   },
