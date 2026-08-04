@@ -4,11 +4,11 @@
 
 ## What changed
 
-`0.2.0` has one durable object: a ticket in the vault that is simultaneously the spec, the agent's brief, the QA checklist, and the billing record. That worked on the TT-06 pilot and it does not survive contact with the rest of the work.
+`0.2.0` has one durable object: a ticket in the vault that is simultaneously the spec, the agent's brief, the QA checklist, and the billing record. That worked on the pilot and it does not survive contact with the rest of the work.
 
 Two pressures broke it.
 
-**The billing unit and the build unit are not the same size.** A TBL homepage is one thing you bill and five things you build — hero, testimonials, footer CTA, and so on, each a full session's worth of prompt. A Tallow Twins audit is the reverse: one thing you were asked to do and nine things you bill separately. One file cannot be both without either splitting the invoice or bloating the prompt.
+**The billing unit and the build unit are not the same size.** An agency homepage is one thing you bill and five things you build — hero, testimonials, footer CTA, and so on, each a full session's worth of prompt. A site audit is the reverse: one thing you were asked to do and nine things you bill separately. One file cannot be both without either splitting the invoice or bloating the prompt.
 
 **The billing record and the build prompt want opposite things.** The invoice wants to stay short, stable, and readable by the client. The build prompt wants to be long, ugly, and complete — full Figma dumps, repo findings, third-party app hazards, and every way a previous attempt went wrong. Keeping both in one file means one of them is always being compromised for the other.
 
@@ -16,7 +16,7 @@ So the object splits in two, along the line of who reads it.
 
 ## The model
 
-**A task is the billing unit.** It lives in the vault, or arrives from Monday and is mirrored there. It carries hours, rate, billing state, and a short client-readable summary of what shipped. It is what you would show Josh. Tasks never nest.
+**A task is the billing unit.** It lives in the vault, or arrives from Monday and is mirrored there. It carries hours, rate, billing state, and a short client-readable summary of what shipped. It is what you would show the client. Tasks never nest.
 
 **A ticket is one build session.** It lives in the repo, under `.cortex/`, and it is the only input a cold `/build` gets. It carries intent, decisions, acceptance criteria, and then every QA and build round appended beneath them. It is never deleted, because the post-build audit reads it.
 
@@ -26,21 +26,21 @@ One task has one or more tickets. Usually one. When the work is more than a sing
 
 ### The two shapes this covers
 
-The Tallow Twins audit is nine independent tasks that share `parent: "Q3 audit"`. Each has its own hours and its own ticket.
+A site audit is nine independent tasks that share `parent: "Q3 audit"`. Each has its own hours and its own ticket.
 
-A TBL homepage is one task with five tickets. Hours land on the homepage; the sections are how you get through it. Each ticket produces one Work Log row on the task, which is the mechanism TT-06 already ran — that ticket had several rows and one total.
+A homepage rebuild is one task with five tickets. Hours land on the homepage; the sections are how you get through it. Each ticket produces one Work Log row on the task, which is the mechanism the pilot already ran — that ticket had several rows and one total.
 
 ### Where things live
 
 ```
 Vault
   Work/<cat>/<client>/<project>/Tasks/
-    TT-01 — Currency selector flag bloat.md      ← task: hours, rate, summary
+    AC-01 — Currency selector flag bloat.md      ← task: hours, rate, summary
     Homepage.md                                   ← task: hours, rate, summary
 
 Repo
   .cortex/
-    TT-01/
+    AC-01/
       ticket.md                                   ← intent, criteria, QA rounds
     homepage/
       01-hero.md
@@ -62,8 +62,8 @@ Not a plugin job. You create it in Obsidian, or it arrives from Monday. The plug
 ```yaml
 ---
 type: freelance-task
-task: TT-01
-client: Tallow Twins
+task: AC-01
+client: Acme Coffee
 project: Shopify Website Build
 parent: "Q3 audit"        # grouping label, optional
 status: todo              # todo | in-progress | review | done
@@ -92,7 +92,7 @@ It routes on what is handed to it alongside the task:
 | a Pastel link | pull the comments as findings |
 | nothing but a task name | grill, because there is nothing else to go on |
 
-Repo research always runs regardless of input. On TT-06 it found the `{% form 'product' %}` wrapper and the Loop Subscriptions widget inside it, which changed the architecture before a line was written — a bar with its own form would have silently converted subscribers to one-time buyers, looked correct, and shipped. Research first, ask second, is not a style preference; it is what makes the questions worth asking.
+Repo research always runs regardless of input. On the pilot it found the `{% form 'product' %}` wrapper and the Loop Subscriptions widget inside it, which changed the architecture before a line was written — a bar with its own form would have silently converted subscribers to one-time buyers, looked correct, and shipped. Research first, ask second, is not a style preference; it is what makes the questions worth asking.
 
 `prototype` remains available as a side trip when the answer has to be seen rather than described. Nothing downstream knows one was taken.
 
@@ -139,12 +139,12 @@ Append-only. Nothing above the line is ever edited — the existing "never rewri
 
 ```markdown
 ---
-task: TT-01
+task: AC-01
 ticket: 01
 created: 2026-08-04
 ---
 
-# TT-01 — Currency selector flag bloat
+# AC-01 — Currency selector flag bloat
 
 ## Intent
 ...
@@ -165,7 +165,7 @@ created: 2026-08-04
 - [x] Bar price matches cart on subscription select — *saw $18.70 in both* · from criteria
 - [ ] Sold-out variant disables the button — *never exercised; no sold-out variant on the store* · from criteria
 - [ ] **Fails.** Bar draws under the cart drawer at 390px — *`elementFromPoint` returned the drawer overlay; separate stacking context, so z-index is irrelevant* · found by QA
-- [ ] **Fails.** Josh wants the price hidden when no variant is chosen · from Pastel
+- [ ] **Fails.** Client wants the price hidden when no variant is chosen · from Pastel
 
 ## Build — round 1 · 2026-08-06
 
@@ -187,10 +187,10 @@ Nothing is memorised. `find_project_by_cwd` resolves the repo to its vault proje
 
 ```
 /ticket
-→ Tallow Twins — 8 tasks ready. TT-01 currency selector, TT-02 homepage
-  image weights, TT-08 structured data… which one?
+→ Acme Coffee — 8 tasks ready. AC-01 currency selector, AC-02 homepage
+  image weights, AC-08 structured data… which one?
 
-/ticket TT-01
+/ticket AC-01
 → skips the ask
 ```
 
@@ -228,13 +228,13 @@ One pass, so two meanings are never alive at once:
 - plugin `README.md`
 - `skills/build/SKILL.md` and `skills/qa/SKILL.md`, bodies and `description` fields
 - the vault project hub's decisions and open questions
-- `docs/agents/issue-tracker.md` in the Tallow Twins repo
+- `docs/agents/issue-tracker.md` in each bound repo
 - vault `Specs/` → `Tasks/`
 
-The nine existing TT files stay where they are and become tasks. They shed their criteria to repo tickets as each is picked up, rather than in a migration.
+Existing ticket files stay where they are and become tasks. They shed their criteria to repo tickets as each is picked up, rather than in a migration.
 
 ## Open
 
 - **Does `/qa` dispatch a subagent, or is the `/clear` enough?** The clear already gives QA a cold start with the ticket as its only input. A dispatched subagent would additionally not see the conversation in which it was invoked. Stronger, and not obviously necessary.
-- **Is the `/ticket` move billable to the client, or overhead?** Carried over from OQ-05, and it now applies to a move that is deliberately more expensive than it was. The TT-06 brief took 0.5 hr of real scoping that materially changed the build, and was logged as billable.
+- **Is the `/ticket` move billable to the client, or overhead?** Carried over from OQ-05, and it now applies to a move that is deliberately more expensive than it was. The pilot brief took 0.5 hr of real scoping that materially changed the build, and was logged as billable.
 - **How far can `/build` run unattended?** Carried over from OQ-03. Build can scaffold, implement, and self-correct alone. Verification is the wall — sustained automated requests against `shopify theme dev` trip Cloudflare bot detection, which does not clear, and working around bot protection is not an option. Open part: whether batching all assertions into very few page loads keeps it under the threshold.
