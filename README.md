@@ -14,8 +14,8 @@ This plugin is deliberately small. It ships only what upstream cannot do:
 |---|---|
 | Brief | [`mattpocock-skills`](https://github.com/mattpocock/skills) — `grill-me` → `to-spec` → `to-tickets` |
 | Per-repo setup | `setup-matt-pocock-skills` |
-| **Build** | **this plugin** |
-| **Sign off** | **this plugin** *(not written yet)* |
+| **Build** | **this plugin** — `/build` |
+| **Sign off** | **this plugin** — `/qa` |
 
 Upstream's `implement` is eight lines that delegate to `tdd`, typechecking, and a test suite. In a theme repo, none of those exist. Upstream's `qa` is deprecated, and was conversational bug intake rather than sign-off.
 
@@ -29,6 +29,9 @@ Upstream's `implement` is eight lines that delegate to `tdd`, typechecking, and 
 
 ```
 /build TT-06
+```
+```
+/qa TT-06
 ```
 
 The ticket ID is the only argument — repo path, vault project, ticket folder, and stage are all derived.
@@ -56,8 +59,16 @@ On the first ticket run through this workflow, browser verification caught four 
 
 None of these break a test. All of them break a customer.
 
+## Why an agent may not tick its own boxes
+
+`qa` exists mostly to resist one pressure. On the pilot, sign-off ticked all sixteen acceptance criteria in a single pass — including five that the same document, in the same edit, recorded as never exercised. It did not feel like lying. The work was finished, the criteria were the plan, the plan had been followed.
+
+So the rule is that a criterion may only be ticked if it was *observed* to be true, in that QA session, in a browser. The test is whether you can say what you saw. Deductions do not tick boxes, and unticked is a respectable outcome.
+
+`qa` also never fixes what it finds — failures go back to `/build` — and never moves a ticket to `done` without explicit acceptance.
+
 ## Status
 
-`0.1.0` — `build` only. `qa` is next.
+`0.2.0` — `build` and `qa`. Together they cost about 66 tokens resident; the bodies are free until invoked.
 
 MIT.

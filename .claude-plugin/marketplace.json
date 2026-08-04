@@ -4,15 +4,21 @@
     "name": "Ben Hungerford"
   },
   "metadata": {
-    "description": "Plugin marketplace for Cortex Code — the client build workflow that runs on Cortex vault tickets."
+    "description": "Plugin marketplace for Cortex Code \u2014 the client build workflow that runs on Cortex vault tickets."
   },
   "plugins": [
     {
       "name": "cortex-code",
       "source": "./",
-      "description": "The build half of the Cortex workflow: implement a vault ticket and verify it in a browser.",
+      "description": "Build and sign off vault tickets: implement against acceptance criteria, verify in a real browser.",
       "category": "engineering",
-      "tags": ["shopify", "wordpress", "liquid", "browser-verification", "obsidian"]
+      "tags": [
+        "shopify",
+        "wordpress",
+        "liquid",
+        "browser-verification",
+        "obsidian"
+      ]
     }
   ]
 }
