@@ -1,6 +1,6 @@
 ---
 name: build
-description: Implement a vault ticket against its criteria and verify it in a real browser. For theme work with no test runner. Usage:/build TT-06
+description: Implement a repo ticket against its criteria and verify it in a real browser. For theme work with no test runner. Usage:/build TT-06
 disable-model-invocation: true
 ---
 
@@ -8,25 +8,45 @@ disable-model-invocation: true
 
 Implement the work described by a ticket, then prove it works by looking at it.
 
-This exists because the usual build loop assumes a test runner and a type checker. Shopify Liquid and WordPress PHP have neither, so red-green is unavailable and the browser is the feedback loop instead. That is not a downgrade — on the pilot ticket the browser caught four real bugs, none of which a test suite would plausibly have caught, and in every case the code read correctly.
+This exists because the usual build loop assumes a test runner and a type checker. Shopify Liquid and WordPress PHP have neither, so red-green is unavailable and the browser is the feedback loop instead. That is not a downgrade — on the pilot the browser caught four real bugs, none of which a test suite would plausibly have caught, and in every case the code read correctly.
+
+## Two files
+
+| | Task | Ticket |
+|---|---|---|
+| Where | vault `Tasks/` | this repo, `.cortex/<task>/` |
+| Is | the billing record | your brief |
+| You write | one Work Log row, proposed hours, `status` | one appended Build round |
+
+You build from the ticket. You bill against the task. Never re-derive scope from the task — it deliberately does not carry criteria.
 
 ## Inputs
 
-`/build <ticket>` — e.g. `/build TT-06`. The ticket ID is the only argument. Everything else is derived.
+`/build <task>` — e.g. `/build TT-06`. Optional.
+
+**With no argument:** read the vault `Tasks/` folder named by `docs/agents/issue-tracker.md`, list every task at `todo` or `in-progress` with its status and estimate, and ask which. Do not pick one silently.
+
+**With a task that has several tickets:** take the lowest-numbered ticket that is not yet accepted, and say which one you took before doing anything else. `/build homepage 02` overrides.
+
+If `docs/agents/issue-tracker.md` does not exist, stop and say so — this repo has not been bound to a vault project.
 
 ## 1. Read the ticket. It is the contract.
 
-Find the ticket via `docs/agents/issue-tracker.md` in this repo, which names the vault folder its tickets live in. Resolve the ID by prefix match on filename. If that file does not exist, stop and say so — this repo has not been bound to a vault project.
+Resolve the task ID by prefix match, then read `.cortex/<task>/`.
 
-**Intent and Decisions are settled.** They came out of a brief that researched the repo and asked the human about the parts research could not settle. Do not relitigate them, do not improve them, and do not quietly build something adjacent. If the work genuinely cannot be done as described, stop and say why — that is a conversation, not a decision you get to make.
+The ticket has a frozen half and an appended half, split by a `---` divider.
 
-**Criteria are the definition of done.** Read them before writing anything, because they usually encode a hazard the ticket found. On the pilot, three criteria existed only because the brief discovered a subscription app inside the product form.
+**Above the divider — Intent, Decisions, Criteria — is settled.** It came out of a `/ticket` session that researched the repo and asked the human about what research could not settle. Do not relitigate it, do not improve it, and do not quietly build something adjacent. If the work genuinely cannot be done as described, stop and say why — that is a conversation, not a decision you get to make.
 
-Set `status: in-progress` if it is not already.
+**Criteria are the definition of done.** Read them before writing anything, because they usually encode a hazard the ticket found. On the pilot, three criteria existed only because research discovered a subscription app inside the product form.
+
+**Below the divider are the rounds.** If QA has run, its findings are there with an origin tag on each. This is the actual work list for a return visit — the specific thing that broke, not the whole ticket again. Read every unresolved item from the most recent QA round before you touch anything.
+
+Set the **task** to `status: in-progress` if it is not already.
 
 ## 2. Orient before editing
 
-Read the files the ticket names. Confirm they still say what the ticket claims — a brief written a week ago describes a repo that may have moved.
+Read the files the ticket names. Confirm they still say what the ticket claims — a ticket written a week ago describes a repo that may have moved.
 
 Branch before touching anything if you are on the default branch.
 
@@ -40,7 +60,7 @@ Follow the ticket's stated approach. Prefer the platform's own data and events o
 
 ## 4. Verify in the browser
 
-This is the part that earns its keep. Work through the Criteria one at a time.
+This is the part that earns its keep. Work through the Criteria one at a time, plus every unresolved QA finding if this is a return round.
 
 ### Use a real rendering browser
 
@@ -80,32 +100,50 @@ Criteria can pass while the screen is wrong. On the pilot the cart was always co
 
 Note which criteria you exercised and which you did not. You are not the one who ticks them — see below.
 
-## 5. Record the work
+## 5. Append the Build round to the ticket
 
-Add one Work Log row for this session. Bump the frontmatter `hours` to match the Work Log total.
+Add a section at the end of the ticket. Never edit above the divider.
+
+```markdown
+## Build — round 1 · 2026-08-06
+
+Moved the bar out of `main-product` into a root-level render so it shares a
+stacking context with the drawer. Added the no-variant price suppression.
+
+Not addressed: the sold-out criterion — no sold-out variant exists on the
+store to test against.
+```
+
+Say what you changed and why, and say plainly what you did not address and why. On a return round, answer the previous QA round item by item — an unanswered finding reads as an overlooked one.
+
+If you found and fixed a bug that no criterion predicted, say so here. Those are the most useful lines in the file a year later, and they are also what the post-build audit reads to work out where the ticket came up short.
+
+## 6. Record the work on the task
+
+Add one Work Log row to the **vault task** for this session. Bump the task's frontmatter `hours` to match the Work Log total.
 
 **Propose hours; never finalise them.** Elapsed session time is not billable time. Research you did quickly and dead ends you created for yourself are not the client's to pay for. State the number you are writing and invite correction — on the pilot the agent logged 3 hours for work the human priced at 2.
 
-Write the Receipt as the record of what actually shipped: what was built, what was verified and how, and every bug found and fixed along the way. Bugs found during the build belong in the Receipt — they are the most useful thing in it later.
+Do not write a summary onto the task. That is written once, at sign-off, from the whole ticket.
 
-## 6. Hand off
+## 7. Hand off
 
-Stop at `status: review`. Print the handoff:
+Stop with the task at `status: review`. Print the handoff:
 
 ```
 /clear
 ```
 ```
-/qa <ticket>
+/qa <task>
 ```
 
 ## Guardrails
 
-The ticket is a billing record, not a scratch file.
+The task is a billing record. The ticket is the evidence behind it.
 
-- **Never delete a ticket.** Cancelled work is closed in place with the reason in the Receipt.
-- **Never move a ticket to `done`.** `review` is as far as this skill goes. Only the human accepts.
+- **Never delete a task or a ticket.** Cancelled work is closed in place with the reason recorded.
+- **Never move a task to `done`.** `review` is as far as this skill goes. Only the human accepts.
+- **Never edit above the ticket's divider.** Intent, Decisions, and Criteria are frozen. Append.
 - **Never tick a criterion.** Ticking is the sign-off move's job, and an agent that ticks its own work ticks everything.
 - **Never invent or adjust `rate`, `billed`, or `invoice`.**
-- **Never rewrite Intent or Decisions** on a ticket in flight.
 - **Anything found after the human has reviewed** is disclosed and re-offered, never folded in silently. An approval covers the state the reviewer saw.

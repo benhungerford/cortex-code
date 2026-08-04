@@ -82,6 +82,6 @@ Two things fall out. A returning build session opens one file and sees the origi
 
 ## Status
 
-`0.2.0` — `build` and `qa`, both written against the previous single-file model and pending a rewrite against the task/ticket split. Design at [`docs/design/2026-08-04-task-and-ticket-model.md`](docs/design/2026-08-04-task-and-ticket-model.md). `ticket` is not written yet.
+`0.3.0` — `build` and `qa`, written against the task/ticket model in [`docs/design/2026-08-04-task-and-ticket-model.md`](docs/design/2026-08-04-task-and-ticket-model.md). Together they cost roughly 70 tokens resident — scaled from the 66 measured at `0.2.0`, whose descriptions were 15 characters shorter in total. The bodies are free until invoked. `ticket` is not written yet.
 
 MIT.
