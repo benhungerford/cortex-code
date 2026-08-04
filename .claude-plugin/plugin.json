@@ -1,0 +1,17 @@
+{
+  "name": "cortex-code",
+  "description": "The build half of the Cortex workflow. Implements a vault ticket against its acceptance criteria and verifies the result in a real browser, for themes and sites where a test runner does not exist.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Ben Hungerford"
+  },
+  "license": "MIT",
+  "keywords": [
+    "shopify",
+    "wordpress",
+    "liquid",
+    "browser-verification",
+    "obsidian",
+    "cortex"
+  ]
+}
