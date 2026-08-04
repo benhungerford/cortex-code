@@ -84,7 +84,7 @@ Two things fall out. A returning build session opens one file and sees the origi
 
 `1.0.0` — the roster is complete. `ticket`, `build`, and `qa`, all written against the task/ticket model in [`docs/design/2026-08-04-task-and-ticket-model.md`](docs/design/2026-08-04-task-and-ticket-model.md).
 
-Resident cost is roughly 108 tokens across the three, against the ~225 originally budgeted for five skills. The bodies — 1,776, 1,557, and 1,644 words — are free until invoked, because every skill is `disable-model-invocation: true`.
+Measured always-on cost is **179 tokens** across the three — about 60 each, per `claude plugin details cortex-code`. Bodies are 1,776, 1,557, and 1,644 words and cost roughly 3k each *on invocation only*, because every skill is `disable-model-invocation: true` and nothing fires them by accident.
 
 Not yet written: `audit`, which reads the kept tickets after a project ends and reports where they came up short. It is deliberately post-project work.
 
