@@ -22,26 +22,50 @@ One task has one or more tickets. Usually one. A homepage is one invoice and fiv
 ## The moves
 
 ```
-/ticket TT-06     research, then ask, then write the ticket
-/clear
-/build TT-06      implement, then prove it in a browser
-/clear
-/qa TT-06         walk the criteria, tick only what you saw
+/foundation                once per repo, then maintained by /build
+/ideation                  chart the fog; resolve one question per session
+  ├ /grill-me
+  ├ /research
+  └ /prototype
+/create-tasks              proposed task set → you approve → written
+/create-tickets            task + capture + foundation → one or more tickets
+/build
+/qa
 ```
 
-The task ID is the only argument, and it is optional — with no argument each move lists what is ready and asks. Repo path, vault project, ticket folder, and stage are all derived.
+The order above is a default, not a gate. Tasks may exist before ideation runs, and often will — a client sends a list, and you ideate each item. Ideation may equally run first and produce the tasks. `/create-tickets` reads whatever exists and does not care which came first. Foundation and ideation are both skippable; a thirty-minute CSS fix goes straight to `/create-tickets`, and when it is unclear the move asks.
+
+The task ID is the only argument most moves take, and it is optional — with no argument each move lists what is ready and asks. Repo path, vault project, ticket folder, and stage are all derived.
 
 A move boundary is a context boundary: every move starts cold with its file as the only input, which is what forces that file to be complete. A move may not print its handoff until every question asked and every finding surfaced is in the file, because after the clear there is no transcript to recover them from.
 
+## The foundation
+
+`/create-tickets` researches the repo on every task. Which snippet renders a button, what the class convention is, which app owns the price element — most of what it finds on task nine is the same as what it found on task one, and it is paid for nine times. `/foundation` pays for it once, scanning the repo and writing four files to `.cortex/foundation/`:
+
+| File | Holds |
+|---|---|
+| `design-system.md` | Tokens with their definition sites, declared-but-dead among them, type scale, spacing, breakpoints, class convention and its counter-examples |
+| `components.md` | Every reusable snippet and section: path, actual render signature, available variants |
+| `platform.md` | Template and section architecture, custom-element conventions, and the events the theme emits |
+| `concerns.md` | Third-party app surface, vendored CSS, do-not-touch areas, half-finished attempts |
+
+Each file opens with a provenance header — generation date, commit SHA, the paths scanned — and every claim carries `file:line`. Anything inferred rather than observed is marked inferred, the same discipline that stops `qa` ticking what it did not see, applied to a document that later moves trust without re-checking.
+
+### It is maintained, not regenerated
+
+The obvious design is a SHA stamp diffed against `HEAD`, warning when stale. That fails in practice, because during an active build the repo moves underneath the foundation daily and the mover is you — the warning fires on nearly every ticket, and a warning that always fires is one you learn to click past.
+
+So `/build` maintains it instead. When a build adds a reusable snippet, it appends that snippet's path and render signature to `components.md`; when it introduces a token or a new event, the corresponding file gets a line. This is a two-line edit at the moment the information is freshest, and it is exactly what those files exist to hold. The SHA check survives as a backstop: `/create-tickets` compares each file's stamp against `HEAD` and speaks up only when changed paths intersect what that file scanned.
+
 ## What is upstream
 
-This plugin is deliberately small. [`mattpocock-skills`](https://github.com/mattpocock/skills) supplies per-repo setup and the capture side trips `/ticket` routes into — `grill-me`, `prototype`, `research`. It reads the vault unmodified via the **Other** issue-tracker option, which records the workflow as freeform prose in `docs/agents/issue-tracker.md`.
+`grill-me`, `research`, and `prototype` began as adaptations of [`mattpocock-skills`](https://github.com/mattpocock/skills)' capture side trips, and are now carried here in full rather than depended on. Uninstall `mattpocock-skills` once these are installed — two skills named `research` and two named `prototype` in one session cannot be told apart at the point of invocation.
 
 Upstream's `implement` is eight lines that delegate to `tdd`, typechecking, and a test suite. In a theme repo, none of those exist. Upstream's `qa` is deprecated, and was conversational bug intake rather than sign-off.
 
 ## Requirements
 
-- [`mattpocock-skills`](https://github.com/mattpocock/skills) installed
 - The [`cortex-vault`](https://github.com/benhungerford/claude-cortex) MCP server, for resolving a repo to its vault project
 - A `docs/agents/issue-tracker.md` in each repo, naming that project's vault `Tasks/` folder and the repo's `.cortex/` ticket path
 
@@ -82,10 +106,13 @@ Two things fall out. A returning build session opens one file and sees the origi
 
 ## Status
 
-`1.0.0` — the roster is complete. `ticket`, `build`, and `qa`, all written against the task/ticket model in [`docs/design/2026-08-04-task-and-ticket-model.md`](docs/design/2026-08-04-task-and-ticket-model.md).
+`2.0.0` — the full chain, from a loose idea to a signed-off build. Nine moves: `foundation`, `ideation`, `grill-me`, `research`, `prototype`, `create-tasks`, `create-tickets`, `build`, `qa`, written against the task/ticket model in [`docs/design/2026-08-04-task-and-ticket-model.md`](docs/design/2026-08-04-task-and-ticket-model.md) and the expansion in [`docs/design/2026-08-05-workflow-expansion-design.md`](docs/design/2026-08-05-workflow-expansion-design.md).
 
-Measured always-on cost is **179 tokens** across the three — about 60 each, per `claude plugin details cortex-code`. Bodies are 1,776, 1,557, and 1,644 words and cost roughly 3k each *on invocation only*, because every skill is `disable-model-invocation: true` and nothing fires them by accident.
+Measured always-on cost is **521 tokens** across the nine — 50 to 70 each, per `claude plugin details cortex-code`. Bodies cost 1.3k to 4.2k tokens each *on invocation only*, because every skill is `disable-model-invocation: true` and nothing fires them by accident.
 
-Not yet written: `audit`, which reads the kept tickets after a project ends and reports where they came up short. It is deliberately post-project work.
+Not yet written:
+
+- `audit`, which reads the kept tickets after a project ends and reports where they came up short. Deliberately post-project work.
+- Platform-skill references inside `/foundation` — it should reach for `shopify-horizon` and its WordPress equivalent rather than deriving conventions from the repo alone.
 
 MIT.
