@@ -19,7 +19,7 @@ def check(path: pathlib.Path) -> list[str]:
 
     body = match.group(1)
     problems = []
-    keys = re.findall(r"^([a-z-]+):", body, re.MULTILINE)
+    keys = re.findall(r"^([A-Za-z0-9_-]+):", body, re.MULTILINE)
 
     if keys != REQUIRED_ORDER:
         problems.append(f"frontmatter keys are {keys}, expected {REQUIRED_ORDER}")
