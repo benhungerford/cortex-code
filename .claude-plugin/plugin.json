@@ -1,7 +1,7 @@
 {
   "name": "cortex-code",
-  "description": "Runs a client build workflow on two files: a task in an Obsidian vault, and a ticket in the repo. Researches and writes the ticket, implements against its criteria, and verifies in a real browser \u2014 for themes and sites where a test runner does not exist.",
-  "version": "1.0.0",
+  "description": "A client build workflow from a loose idea to a signed-off build. Charts a map of open questions, proposes the billable tasks, assembles the build tickets, implements against their criteria, and verifies in a real browser \u2014 for themes and sites where a test runner does not exist.",
+  "version": "2.0.0",
   "author": {
     "name": "Ben Hungerford"
   },
@@ -12,6 +12,8 @@
     "liquid",
     "browser-verification",
     "obsidian",
-    "cortex"
+    "cortex",
+    "wayfinding",
+    "design-system"
   ]
 }
