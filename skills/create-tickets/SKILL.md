@@ -1,6 +1,6 @@
 ---
-name: ticket
-description: Research the repo, ask only what research cannot settle, and write the build ticket into .cortex/ for a cold build session. Usage:/ticket TT-06
+name: create-tickets
+description: Assemble one or more build tickets from the task, its capture folder, and the foundation files — routing back when something is missing. Usage:/create-tickets TT-06
 disable-model-invocation: true
 ---
 
