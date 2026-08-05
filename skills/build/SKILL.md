@@ -129,13 +129,19 @@ If `.cortex/foundation/` exists, update it as part of this build, not as a separ
 - A new event the theme emits, or a new custom element convention → `platform.md`.
 - A third-party app hazard you hit → `concerns.md`.
 
-Set the `commit:` stamp to the short SHA of `HEAD` **after this build's own commit lands**, updating it as a follow-up to that commit rather than stamping the `HEAD` you started from. A pre-build stamp records every path this build is about to touch as changed, which is exactly what `/create-tickets` intersects against `scanned:` — so it fires the staleness check on every ticket. Extend `scanned:` if you touched a path it did not cover.
+Extend `scanned:` if you touched a path it did not cover.
 
 These files exist so `/create-tickets` does not re-derive standing facts on every task, and they are only worth trusting if the move that changes the repo is also the move that records the change.
 
 Skip this section entirely if `.cortex/foundation/` is absent — foundation is optional.
 
-## 7. Record the work on the task
+## 7. Commit, then stamp the foundation
+
+Commit this build's work, then set the `commit:` stamp on each foundation file you touched to the short SHA of the resulting `HEAD`. The order matters: a stamp taken before the commit names the state this build changed, so `/create-tickets` intersects the build's own edits against `scanned:` and fires the staleness check on every ticket.
+
+Skip the stamp if `.cortex/foundation/` is absent.
+
+## 8. Record the work on the task
 
 Add one Work Log row to the **vault task** for this session. Bump the task's frontmatter `hours` to match the Work Log total.
 
@@ -143,7 +149,7 @@ Add one Work Log row to the **vault task** for this session. Bump the task's fro
 
 Do not write a summary onto the task. That is written once, at sign-off, from the whole ticket.
 
-## 8. Hand off
+## 9. Hand off
 
 Stop with the task at `status: review`. Print the handoff:
 

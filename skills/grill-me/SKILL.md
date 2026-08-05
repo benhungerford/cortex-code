@@ -53,7 +53,7 @@ grilled: 2026-08-05
 - <question the human deferred, and what it blocks>
 ```
 
-When invoked from a map question there is no task, so replace `task:` with `map:` and `question:` — the map note's name and the question this resolves — matching the question frontmatter `/ideation` writes.
+When invoked from a map question there is no task, so replace `task:` with `map:` and `question:` — `map:` matching the question note's own `map:` key, and `question:` naming the question note.
 
 `Still open` is not a failure state. A question the human deliberately deferred is information a later assembly step needs; an empty `Still open` on a grill that ended early is a lie.
 

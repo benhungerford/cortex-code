@@ -29,7 +29,7 @@ it before choosing a question.>
 
 ## Notes
 
-<domain; skills every session should consult; standing preferences>
+<effort slug; domain; skills every session should consult; standing preferences>
 
 ## Decisions so far
 
@@ -81,7 +81,7 @@ Fog gathers only toward the destination, so work that sits beyond the destinatio
 
 ## Where artifacts live
 
-`.cortex/ideation/<effort>/`, where `<effort>` is a kebab-case slug of the map note's name. The map records that slug, so every capture session fired from it writes to the same folder rather than deriving its own. The three capture moves already know this — `grill-me`, `research`, and `prototype` each write their own files there when invoked from a map question, and this file does not restate their naming patterns.
+`.cortex/ideation/<effort>/`, where `<effort>` is a kebab-case slug of the map note's name. The map records that slug in its `## Notes` section, so every capture session fired from it writes to the same folder rather than deriving its own. The three capture moves already know this — `grill-me`, `research`, and `prototype` each write their own files there when invoked from a map question, and this file does not restate their naming patterns.
 
 Ideation frequently runs the week a project is won, before a repo exists to hold a `.cortex/` folder at all. This is a normal case, not an edge one — a client hands over a loose idea long before there's anything to check out. When there is no repo yet, the map holds those artifacts inline instead, and they move to `.cortex/ideation/<effort>/` once a repo exists to receive them. Blocking ideation on a missing repo would just push the work back into a chat window that dies with the session, which is the exact failure this move exists to end.
 

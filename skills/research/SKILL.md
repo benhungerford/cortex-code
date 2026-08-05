@@ -61,7 +61,7 @@ researched: 2026-08-05
 <the options this closes, and why>
 ```
 
-When invoked from a map question there is no task, so replace `task:` with `map:` and `question:` — the map note's name and the question this resolves — matching the question frontmatter `/ideation` writes.
+When invoked from a map question there is no task, so replace `task:` with `map:` and `question:` — `map:` matching the question note's own `map:` key, and `question:` naming the question note.
 
 `What this rules out` is the section that earns the file. An answer that does not change what gets built was not worth researching, and writing down what it closes is what forces that check — an answer with nothing to rule out is a sign the question was not sharp enough to need a background agent in the first place.
 

@@ -66,7 +66,7 @@ branch: prototype/sticky-bar-variants
 <the options this closed>
 ```
 
-When invoked from a map question there is no task, so replace `task:` with `map:` and `question:` — the map note's name and the question this resolves — matching the question frontmatter `/ideation` writes.
+When invoked from a map question there is no task, so replace `task:` with `map:` and `question:` — `map:` matching the question note's own `map:` key, and `question:` naming the question note.
 
 `## Verdict` records a reaction, not an inference — the entire point of a prototype is that a human looked at running code and said something back, and that something is what belongs here, in their words. `## What it ruled out` carries the same discipline as `research`'s equivalent section: the options this closed are what makes the branch worth having sat on for however long it took to build. A verdict with nothing ruled out is a sign the prototype answered a question nobody was actually undecided about.
 
