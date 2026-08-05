@@ -54,9 +54,13 @@ status: todo
 estimate_low: 1
 estimate_high: 2
 hours: 0
+billed: false
+invoice: ""
 cortex: .cortex/TT-06/
 ---
 ```
+
+`billed` and `invoice` are written at their defaults because a new task is, by definition, unbilled. `rate` is deliberately absent — it's a real per-client number this move has no basis to know, and the human sets it.
 
 `cortex:` is the pointer to the capture folder that `/create-tickets` will write into. Write it now, before that folder exists — the pointer is the contract, and the folder catches up to it.
 
@@ -79,7 +83,7 @@ Wherever `docs/agents/issue-tracker.md` names. This keeps Obsidian and Monday a 
 
 - **Never write a task without explicit approval of the set.** Approval of one row is not approval of the table.
 - **Never invent hours.** Propose them, state the assumption behind each one, and invite correction.
-- **Never invent or adjust `rate`, `billed`, or `invoice`.** Those belong to billing, not to this move.
+- **Never invent a `rate`.** Set `billed` and `invoice` to nothing but their defaults — `false` and `""`. Those belong to billing, not to this move.
 - **Never nest tasks.** `parent:` is a grouping label, not a container — nothing resolves through it.
 - **Never draw tasks from a map with open questions.** Name what's still open and stop.
 - **Never write a task and then quietly adjust it.** A changed set is re-proposed, not patched in place.
