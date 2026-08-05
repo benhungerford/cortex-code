@@ -8,13 +8,15 @@ disable-model-invocation: true
 
 The move that turns a cleared map into billable work.
 
-Every other move in this plugin is forbidden from authoring a task. `ticket`'s guardrails say it plainly: never invent a task, because a task is a billing record and the plugin reads them rather than creating them. `create-tasks` is the one exception to that rule, and it is only allowed to be the exception because it never writes without explicit human approval of the whole proposed set. If you finish reading this file still able to imagine it writing a task unattended, read it again — that reading is wrong.
+Every other move in this plugin is forbidden from authoring a task. `create-tickets`' guardrails say it plainly: never invent a task, because a task is a billing record and the plugin reads them rather than creating them. `create-tasks` is the one exception to that rule, and it is only allowed to be the exception because it never writes without explicit human approval of the whole proposed set. If you finish reading this file still able to imagine it writing a task unattended, read it again — that reading is wrong.
 
 ## Inputs
 
-A map whose questions are all closed, or a brief handed in directly. With neither, ask what to draw the tasks from.
+`/create-tasks <map>` — the name of a map whose questions are all closed. A brief handed in directly works too. With neither, ask what to draw the tasks from.
 
 If a map has open questions, do not propose tasks against it. Say which questions are still open and stop. A task drawn from an unfinished map carries decisions that have not been made yet, and the billing record ends up resting on a guess rather than a resolution.
+
+The same applies to `Not yet specified`. A map is only finished when that section is empty too — anything left in it is an in-scope decision still coming. Name what you found there and stop.
 
 ## What a task is
 
@@ -41,7 +43,7 @@ Nothing is written until the human approves the set as shown. If the human wants
 
 ## The task file
 
-Each approved row becomes one task file, with this frontmatter, verbatim and matching the task and ticket model:
+Each approved row becomes one task file, with this frontmatter, verbatim — the task and ticket model's block minus `rate:` and plus `cortex:`, `rate` being the human's to set when they price the task:
 
 ```yaml
 ---

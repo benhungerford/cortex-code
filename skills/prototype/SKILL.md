@@ -1,6 +1,6 @@
 ---
 name: prototype
-description: Build throwaway code that answers a design or behaviour question — UI variants on one route, or real theme state driven in a browser. Usage:/prototype TT-06
+description: Build throwaway code that answers a design or behaviour question — UI variants on one route, or real theme state driven in a browser. Usage:/prototype TT-06 <question>
 disable-model-invocation: true
 ---
 
@@ -12,7 +12,7 @@ This is the last of three capture moves — alongside `grill-me` and `research` 
 
 ## Inputs
 
-`/prototype <task> <question>` writes its pointer file to `.cortex/<task>/`. `/prototype <question>`, invoked inside an ideation session, writes to `.cortex/ideation/<effort>/`. Same rule as its siblings: with neither a task nor an ideation session to place it in, ask which before starting rather than guessing. A pointer file in the wrong folder points nowhere a later move will look, and a prototype without a pointer is a branch nobody will ever find again.
+`/prototype <task> <question>` writes its pointer file to `.cortex/<task>/`. `/prototype <question>`, invoked inside an ideation session, writes to `.cortex/ideation/<effort>/`, taking the effort slug from the map rather than deriving one here. Same rule as its siblings: with neither a task nor an ideation session to place it in, ask which before starting rather than guessing. A pointer file in the wrong folder points nowhere a later move will look, and a prototype without a pointer is a branch nobody will ever find again.
 
 ## Pick a branch
 
@@ -65,6 +65,8 @@ branch: prototype/sticky-bar-variants
 
 <the options this closed>
 ```
+
+When invoked from a map question there is no task, so replace `task:` with `map:` and `question:` — the map note's name and the question this resolves — matching the question frontmatter `/ideation` writes.
 
 `## Verdict` records a reaction, not an inference — the entire point of a prototype is that a human looked at running code and said something back, and that something is what belongs here, in their words. `## What it ruled out` carries the same discipline as `research`'s equivalent section: the options this closed are what makes the branch worth having sat on for however long it took to build. A verdict with nothing ruled out is a sign the prototype answered a question nobody was actually undecided about.
 

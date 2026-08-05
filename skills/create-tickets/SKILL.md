@@ -34,7 +34,9 @@ Read in this order. The order matters — each layer narrows what the next one h
 
 2. **Every file in `.cortex/<task>/`** — `grill-*.md`, `research-*.md`, `prototype-*.md`. Read all of them, including the ones that look tangential. Two things in that folder are worth more than the rest: a `Still open` entry in a grill transcript, because it is a question the human deliberately declined to answer and it may be exactly what blocks this ticket; and a `What this rules out` section in a research file, because it closes options you would otherwise spend the ticket weighing.
 
-3. **All four `.cortex/foundation/*.md`** — `design-system.md`, `components.md`, `platform.md`, `concerns.md`. These are the standing facts about this repo. `concerns.md` in particular names the third-party app surface, and that is the most common source of a hazard a ticket has to encode. If these files do not exist, say so and offer `/foundation`. Do not treat their absence as a blocker — a small fix does not need them.
+3. **The ideation artifacts behind this task.** Follow the task's `## From the map` links to their questions, and read whatever those questions produced in `.cortex/ideation/<effort>/`. The map carries the decision; it does not carry the research that settled it or the prototype branch that proved it, and both are written into that folder by moves that ran before the task existed. Nothing else in the workflow opens it.
+
+4. **All four `.cortex/foundation/*.md`** — `design-system.md`, `components.md`, `platform.md`, `concerns.md`. These are the standing facts about this repo. `concerns.md` in particular names the third-party app surface, and that is the most common source of a hazard a ticket has to encode. If these files do not exist, say so and offer `/foundation`. Do not treat their absence as a blocker — a small fix does not need them.
 
 ## 2. Check the foundation is current
 
@@ -74,7 +76,7 @@ If it could, write it. If it could not, **name the specific hole, say which move
 |---|---|
 | A decision only the human can make | `/grill-me <task>` |
 | A fact that lives outside the repo | `/research <task> <question>` |
-| An answer that has to be seen rather than described | `/prototype <task>` |
+| An answer that has to be seen rather than described | `/prototype <task> <question>` |
 | The destination itself is unclear — what to build, not how | `/ideation` |
 
 Stopping is cheaper than continuing because each route-back is a fresh cold session with a single job, rather than a grill buried three thousand words into a research pass. A question asked in its own session gets the whole session's attention and lands in a file. A question asked mid-assembly gets whatever attention is left, and lands in a transcript that is about to be cleared. That is what removing the side trips buys.

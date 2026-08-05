@@ -26,13 +26,15 @@ You build from the ticket. You bill against the task. Never re-derive scope from
 
 **With no argument:** read the vault `Tasks/` folder named by `docs/agents/issue-tracker.md`, list every task at `todo` or `in-progress` with its status and estimate, and ask which. Do not pick one silently.
 
-**With a task that has several tickets:** take the lowest-numbered ticket that is not yet accepted, and say which one you took before doing anything else. `/build homepage 02` overrides.
+**With a task that has several tickets:** take the lowest-numbered `NN-<slug>.md` ticket that is not yet accepted, and say which one you took before doing anything else. `/build homepage 02` overrides.
 
 If `docs/agents/issue-tracker.md` does not exist, stop and say so — this repo has not been bound to a vault project.
 
 ## 1. Read the ticket. It is the contract.
 
 Resolve the task ID by prefix match, then read `.cortex/<task>/`.
+
+The ticket is `ticket.md`, or `NN-<slug>.md` where the task was split. Everything else in that folder — `grill-*.md`, `research-*.md`, `prototype-*.md` — is capture, read for context only, and a grill's `## Still open` entry is a question the human declined to answer rather than part of the brief.
 
 The ticket has a frozen half and an appended half, split by a `---` divider.
 
@@ -127,7 +129,7 @@ If `.cortex/foundation/` exists, update it as part of this build, not as a separ
 - A new event the theme emits, or a new custom element convention → `platform.md`.
 - A third-party app hazard you hit → `concerns.md`.
 
-Bump the `commit:` stamp and extend `scanned:` if you touched a path it did not cover.
+Set the `commit:` stamp to the short SHA of `HEAD` **after this build's own commit lands**, updating it as a follow-up to that commit rather than stamping the `HEAD` you started from. A pre-build stamp records every path this build is about to touch as changed, which is exactly what `/create-tickets` intersects against `scanned:` — so it fires the staleness check on every ticket. Extend `scanned:` if you touched a path it did not cover.
 
 These files exist so `/create-tickets` does not re-derive standing facts on every task, and they are only worth trusting if the move that changes the repo is also the move that records the change.
 

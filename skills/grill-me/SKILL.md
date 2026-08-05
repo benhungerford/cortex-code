@@ -12,7 +12,7 @@ This is one of three capture moves — alongside `research` and `prototype` — 
 
 ## Inputs
 
-`/grill-me <task>` writes to `.cortex/<task>/`. `/grill-me` with no argument, invoked inside an ideation session, writes to `.cortex/ideation/<effort>/`. With neither a task nor an ideation session to place it in, ask which before starting. Do not guess a home — a transcript written to the wrong folder is a transcript no later move will find.
+`/grill-me <task>` writes to `.cortex/<task>/`. `/grill-me` with no argument, invoked inside an ideation session, writes to `.cortex/ideation/<effort>/`, taking the effort slug from the map rather than deriving one here. With neither a task nor an ideation session to place it in, ask which before starting. Do not guess a home — a transcript written to the wrong folder is a transcript no later move will find.
 
 ## How to grill
 
@@ -30,7 +30,7 @@ A branch can end two ways once it has been asked: the human answers, and the ans
 
 ## Write as you go
 
-Append each answer to the transcript file as it is given, in the human's own terms rather than your summary of them. Not at the end, when you are summarising and will smooth what was said into something more agreeable. This mirrors the rule already in the ticket move, and it is the reason the transcript is worth reading cold: a later session gets what the human actually said, not what you thought they meant.
+Append each answer to the transcript file as it is given, in the human's own terms rather than your summary of them. Not at the end, when you are summarising and will smooth what was said into something more agreeable. This mirrors the rule already in the `create-tickets` move, and it is the reason the transcript is worth reading cold: a later session gets what the human actually said, not what you thought they meant.
 
 ## The transcript
 
@@ -52,6 +52,8 @@ grilled: 2026-08-05
 
 - <question the human deferred, and what it blocks>
 ```
+
+When invoked from a map question there is no task, so replace `task:` with `map:` and `question:` — the map note's name and the question this resolves — matching the question frontmatter `/ideation` writes.
 
 `Still open` is not a failure state. A question the human deliberately deferred is information a later assembly step needs; an empty `Still open` on a grill that ended early is a lie.
 

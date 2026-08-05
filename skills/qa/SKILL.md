@@ -26,7 +26,7 @@ The test: *can you say what you saw?* "The cart line came back with `selling_pla
 
 ## 1. Read the ticket
 
-Find it via `docs/agents/issue-tracker.md`, then read `.cortex/<task>/`.
+Find it via `docs/agents/issue-tracker.md`, then read `.cortex/<task>/`. The ticket is `ticket.md`, or `NN-<slug>.md` where the task was split. Everything else in that folder — `grill-*.md`, `research-*.md`, `prototype-*.md` — is capture, read for context only, and a grill's `## Still open` entry is a question the human declined to answer rather than part of the brief.
 
 Read Intent, Decisions, and Criteria above the divider, then every round below it. The most recent Build round tells you what the builder claims and what they say they did not check. **Do not treat their unchecked list as authoritative in either direction** — they may have missed something they thought they covered, and they may have fixed something they forgot to mention.
 

@@ -12,7 +12,7 @@ This is one of three capture moves — alongside `grill-me` and `prototype` — 
 
 ## Inputs
 
-`/research <task> <question>` writes to `.cortex/<task>/`. `/research <question>`, invoked inside an ideation session, writes to `.cortex/ideation/<effort>/`. Same two-home rule as `grill-me`: with neither a task nor an ideation session to place it in, ask which before starting rather than guessing. A findings file written to the wrong folder is a findings file no later move will find.
+`/research <task> <question>` writes to `.cortex/<task>/`. `/research <question>`, invoked inside an ideation session, writes to `.cortex/ideation/<effort>/`, taking the effort slug from the map rather than deriving one here. Same two-home rule as `grill-me`: with neither a task nor an ideation session to place it in, ask which before starting rather than guessing. A findings file written to the wrong folder is a findings file no later move will find.
 
 ## Spin up a background agent
 
@@ -60,6 +60,8 @@ researched: 2026-08-05
 
 <the options this closes, and why>
 ```
+
+When invoked from a map question there is no task, so replace `task:` with `map:` and `question:` — the map note's name and the question this resolves — matching the question frontmatter `/ideation` writes.
 
 `What this rules out` is the section that earns the file. An answer that does not change what gets built was not worth researching, and writing down what it closes is what forces that check — an answer with nothing to rule out is a sign the question was not sharp enough to need a background agent in the first place.
 
