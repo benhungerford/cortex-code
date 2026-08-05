@@ -36,7 +36,7 @@ Resolve the task ID by prefix match, then read `.cortex/<task>/`.
 
 The ticket has a frozen half and an appended half, split by a `---` divider.
 
-**Above the divider — Intent, Decisions, Criteria — is settled.** It came out of a `/ticket` session that researched the repo and asked the human about what research could not settle. Do not relitigate it, do not improve it, and do not quietly build something adjacent. If the work genuinely cannot be done as described, stop and say why — that is a conversation, not a decision you get to make.
+**Above the divider — Intent, Decisions, Criteria — is settled.** It came out of a `/create-tickets` session that researched the repo and asked the human about what research could not settle. Do not relitigate it, do not improve it, and do not quietly build something adjacent. If the work genuinely cannot be done as described, stop and say why — that is a conversation, not a decision you get to make.
 
 **Criteria are the definition of done.** Read them before writing anything, because they usually encode a hazard the ticket found. On the pilot, three criteria existed only because research discovered a subscription app inside the product form.
 
@@ -118,7 +118,22 @@ Say what you changed and why, and say plainly what you did not address and why. 
 
 If you found and fixed a bug that no criterion predicted, say so here. Those are the most useful lines in the file a year later, and they are also what the post-build audit reads to work out where the ticket came up short.
 
-## 6. Record the work on the task
+## 6. Keep the foundation current
+
+If `.cortex/foundation/` exists, update it as part of this build, not as a separate chore:
+
+- A new reusable snippet or section → append its path and its actual render signature to `components.md`.
+- A new token, or a token that changed meaning → the corresponding line in `design-system.md`.
+- A new event the theme emits, or a new custom element convention → `platform.md`.
+- A third-party app hazard you hit → `concerns.md`.
+
+Bump the `commit:` stamp and extend `scanned:` if you touched a path it did not cover.
+
+These files exist so `/create-tickets` does not re-derive standing facts on every task, and they are only worth trusting if the move that changes the repo is also the move that records the change.
+
+Skip this section entirely if `.cortex/foundation/` is absent — foundation is optional.
+
+## 7. Record the work on the task
 
 Add one Work Log row to the **vault task** for this session. Bump the task's frontmatter `hours` to match the Work Log total.
 
@@ -126,7 +141,7 @@ Add one Work Log row to the **vault task** for this session. Bump the task's fro
 
 Do not write a summary onto the task. That is written once, at sign-off, from the whole ticket.
 
-## 7. Hand off
+## 8. Hand off
 
 Stop with the task at `status: review`. Print the handoff:
 
@@ -147,3 +162,4 @@ The task is a billing record. The ticket is the evidence behind it.
 - **Never tick a criterion.** Ticking is the sign-off move's job, and an agent that ticks its own work ticks everything.
 - **Never invent or adjust `rate`, `billed`, or `invoice`.**
 - **Anything found after the human has reviewed** is disclosed and re-offered, never folded in silently. An approval covers the state the reviewer saw.
+- **Never let the foundation files drift from what you just built.**
