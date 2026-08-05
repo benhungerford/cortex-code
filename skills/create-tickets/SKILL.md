@@ -26,17 +26,19 @@ This move assembles. The capture moves — `/grill-me`, `/research`, `/prototype
 
 ## 1. Read everything that already exists
 
-In this order. The order matters — each layer narrows what the next one has to establish, and reading the repo before reading the capture folder means re-deriving facts somebody already wrote down.
+Whatever came with the command — a paragraph of detail, a live URL, a Figma link, a screenshot, a Pastel link — is intent, not evidence. Confirm every factual claim in it against the code before it reaches a criterion; people misremember their own repos. Reproduce a described bug before describing it. The rest feeds the section 3 repo pass, and what that pass cannot settle goes through the section 4 table.
+
+Read in this order. The order matters — each layer narrows what the next one has to establish, and reading the repo before reading the capture folder means re-deriving facts somebody already wrote down.
 
 1. **The task**, followed from wherever `docs/agents/issue-tracker.md` names. Its frontmatter carries `cortex:`, the pointer to the capture folder. Read its `## From the map` section: those decisions are already made, and they are not to be relitigated here. A ticket that reopens a settled map decision spends the human's attention on a question they already answered.
 
 2. **Every file in `.cortex/<task>/`** — `grill-*.md`, `research-*.md`, `prototype-*.md`. Read all of them, including the ones that look tangential. Two things in that folder are worth more than the rest: a `Still open` entry in a grill transcript, because it is a question the human deliberately declined to answer and it may be exactly what blocks this ticket; and a `What this rules out` section in a research file, because it closes options you would otherwise spend the ticket weighing.
 
-3. **All four `.cortex/foundation/*.md`** — `design-system.md`, `components.md`, `platform.md`, `concerns.md`. These are the standing facts about this repo. `concerns.md` in particular names the third-party app surface, and that is the most common source of a hazard a ticket has to encode.
+3. **All four `.cortex/foundation/*.md`** — `design-system.md`, `components.md`, `platform.md`, `concerns.md`. These are the standing facts about this repo. `concerns.md` in particular names the third-party app surface, and that is the most common source of a hazard a ticket has to encode. If these files do not exist, say so and offer `/foundation`. Do not treat their absence as a blocker — a small fix does not need them.
 
 ## 2. Check the foundation is current
 
-Compare each foundation file's `commit:` stamp against `HEAD`.
+Skip this check entirely when the foundation files are absent. Otherwise, compare each foundation file's `commit:` stamp against `HEAD`.
 
 ```bash
 git diff --name-only <stamped-commit>..HEAD
@@ -76,6 +78,8 @@ If it could, write it. If it could not, **name the specific hole, say which move
 | The destination itself is unclear — what to build, not how | `/ideation` |
 
 Stopping is cheaper than continuing because each route-back is a fresh cold session with a single job, rather than a grill buried three thousand words into a research pass. A question asked in its own session gets the whole session's attention and lands in a file. A question asked mid-assembly gets whatever attention is left, and lands in a transcript that is about to be cleared. That is what removing the side trips buys.
+
+A task that arrived with no ideation behind it and an empty capture folder is the normal small-task path, not a gap. Repo research alone is often enough for it.
 
 The counter-pressure matters just as much, or this becomes a machine for deferring. Research and the capture folder settle most things. Route back for what genuinely blocks a ticket — a decision the ticket cannot be written without, a fact a criterion depends on — not for every question you could imagine asking. A move that routes back on the third read of a well-captured folder has stopped assembling and started stalling.
 
