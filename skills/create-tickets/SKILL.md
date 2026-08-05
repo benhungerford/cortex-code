@@ -4,7 +4,7 @@ description: Assemble one or more build tickets from the task, its capture folde
 disable-model-invocation: true
 ---
 
-# ticket
+# create-tickets
 
 Write the file a cold build session will work from.
 
@@ -12,34 +12,43 @@ Everything downstream is only as good as this. `/build` reads the ticket and not
 
 So this move is allowed to be expensive. It is the one place in the workflow where thoroughness is cheaper than speed.
 
+This move assembles. The capture moves — `/grill-me`, `/research`, `/prototype` — did the asking, the reading, and the building-to-see, and left their output on disk. This move reads all of it, researches what is specific to this task, and judges whether that is enough. When it is not, it names the hole and routes back rather than filling it here.
+
 ## Inputs
 
-`/ticket <task>` — e.g. `/ticket TT-06`. Optional, and it is normal to hand it more than the ID.
+`/create-tickets <task>` — e.g. `/create-tickets TT-06`. Optional, and it is normal to hand it more than the ID.
 
 **With no argument:** read the vault `Tasks/` folder named by `docs/agents/issue-tracker.md`, list every task at `todo` that has no ticket in `.cortex/` yet, and ask which. Do not pick one silently.
 
-**If the named task does not exist in the vault:** stop. The plugin reads tasks; it does not invent them — a task is a billing record and it comes from Obsidian or Monday. Say what is missing and what its frontmatter needs. If the human then asks you to create it, do so from what is on hand and show it to them before continuing. Never create one as a side effect of being asked for a ticket.
+**If the named task does not exist in the vault:** stop. The plugin reads tasks; it does not invent them — a task is a billing record, and only `/create-tasks` authors one, only with sign-off. Say what is missing and what its frontmatter needs. Never create a task as a side effect of being asked for a ticket.
 
 **If a ticket already exists for this task:** stop and say so. Above the divider is frozen once written. If the work has genuinely changed, that is a new ticket on the same task, numbered after the existing one.
 
-## 1. Route on what you were handed
+## 1. Read everything that already exists
 
-Whatever came with the command tells you which capture avenues to run. This is a routing decision, not a menu to present.
+In this order. The order matters — each layer narrows what the next one has to establish, and reading the repo before reading the capture folder means re-deriving facts somebody already wrote down.
 
-| What you were handed | What to run |
-|---|---|
-| A Figma URL | Pull design context — tokens, spacing, breakpoints, component names. Name the frame you read. |
-| A live URL, or a described bug | Fetch and inspect the rendered page. Reproduce it before describing it. |
-| A paragraph of the human's own detail | Take it as intent, then confirm every factual claim in it against the code. People misremember their own repos. |
-| A Pastel link | Pull the comments as findings. Each becomes a criterion or an explicit out-of-scope note. |
-| A screenshot | Read it, then find the corresponding markup. A screenshot tells you what is wrong, never why. |
-| Nothing but a task ID | Research the repo, then grill. There is nothing else to go on. |
+1. **The task**, followed from wherever `docs/agents/issue-tracker.md` names. Its frontmatter carries `cortex:`, the pointer to the capture folder. Read its `## From the map` section: those decisions are already made, and they are not to be relitigated here. A ticket that reopens a settled map decision spends the human's attention on a question they already answered.
 
-Several of these can apply at once. Run all that do.
+2. **Every file in `.cortex/<task>/`** — `grill-*.md`, `research-*.md`, `prototype-*.md`. Read all of them, including the ones that look tangential. Two things in that folder are worth more than the rest: a `Still open` entry in a grill transcript, because it is a question the human deliberately declined to answer and it may be exactly what blocks this ticket; and a `What this rules out` section in a research file, because it closes options you would otherwise spend the ticket weighing.
 
-## 2. Research the repo. Always.
+3. **All four `.cortex/foundation/*.md`** — `design-system.md`, `components.md`, `platform.md`, `concerns.md`. These are the standing facts about this repo. `concerns.md` in particular names the third-party app surface, and that is the most common source of a hazard a ticket has to encode.
 
-This runs regardless of what else you were handed, and it runs *before* you ask the human anything.
+## 2. Check the foundation is current
+
+Compare each foundation file's `commit:` stamp against `HEAD`.
+
+```bash
+git diff --name-only <stamped-commit>..HEAD
+```
+
+Speak up **only when the changed paths intersect that file's `scanned:` list**. When it fires, offer a targeted re-run of the affected file, not a full regeneration of all four.
+
+This check is deliberately quiet. `/build` maintains the foundation files as it goes, so correctly maintained they stay accurate for weeks at a time. A check that fires every week is a check the human learns to click past, and then it is worth nothing on the week it was right.
+
+## 3. Research the repo
+
+What the foundation files already establish is not re-derived here. This pass covers what is specific to *this* task — the files this work actually touches, and the hazards that only show up once you know what is being built.
 
 On the pilot this is what earned the whole move. Research found that `{% form 'product' %}` wrapped every block on the product page and that the Loop Subscriptions widget rendered its `selling_plan` input inside that same form. That one fact changed the architecture before a line was written — a sticky bar with its own form would have silently converted subscribers into one-time buyers, looked completely correct, and shipped. Three of the ticket's criteria existed only because of it.
 
@@ -53,33 +62,34 @@ What to establish, every time:
 
 Say what you checked and what you found, with file and line references. A claim in a ticket that cannot be traced to a file is a claim `/build` will have to re-derive.
 
-### Side trips
+## 4. Judge whether you have enough
 
-Three, each returning here. They are not stages — nothing downstream knows one was taken.
+Ask the question plainly: could a cold `/build` session, opening only the ticket you are about to write, do this work correctly?
 
-- **prototype** — when the answer has to be seen rather than described.
-- **research** — when the facts live outside the repo.
-- **wayfinder** — when the destination itself is foggy and the question is what to build, not how.
+If it could, write it. If it could not, **name the specific hole, say which move fills it, and stop.** Do not fill the gap inline.
 
-## 3. Then ask
+| What is missing | Where it goes |
+|---|---|
+| A decision only the human can make | `/grill-me <task>` |
+| A fact that lives outside the repo | `/research <task> <question>` |
+| An answer that has to be seen rather than described | `/prototype <task>` |
+| The destination itself is unclear — what to build, not how | `/ideation` |
 
-Only what research could not settle. A question the repo already answers spends the human's attention and teaches them the questions are not worth answering carefully.
+Stopping is cheaper than continuing because each route-back is a fresh cold session with a single job, rather than a grill buried three thousand words into a research pass. A question asked in its own session gets the whole session's attention and lands in a file. A question asked mid-assembly gets whatever attention is left, and lands in a transcript that is about to be cleared. That is what removing the side trips buys.
 
-Good questions at this stage are about intent, priorities, and trade-offs the code cannot express: which behaviour is correct when two are defensible, what happens in the case nobody has decided about, whether an edge case is worth handling at all.
+The counter-pressure matters just as much, or this becomes a machine for deferring. Research and the capture folder settle most things. Route back for what genuinely blocks a ticket — a decision the ticket cannot be written without, a fact a criterion depends on — not for every question you could imagine asking. A move that routes back on the third read of a well-captured folder has stopped assembling and started stalling.
 
-Ask them one at a time. Write each answer into the ticket as you get it — not at the end, when you are summarising and will smooth it into something more agreeable than what was said.
-
-## 4. Decide whether it is one sitting
+## 5. Decide whether it is one sitting
 
 If what you have described is more than one build session's worth of work, say so and propose a split. This is part of the job, not something to wait to be asked for.
 
-A homepage with five sections is one task and five tickets. Each ticket is independently buildable and independently verifiable. The hours still land on the one task.
+This move may write one ticket or several. A homepage with five sections is one task and five tickets. Each ticket is independently buildable and independently verifiable, and each is researched on its own terms — five tickets written cheaply from one pass of research is the failure this move exists to prevent. The hours still land on the one task.
 
-Propose the split with a one-line description of each ticket and the order. The human approves it. Then write them as `01-<slug>.md`, `02-<slug>.md`, and so on in `.cortex/<task>/`.
+Where the split is not obvious, propose it with a one-line description of each ticket and the order, and confirm before writing anything. The human approves it. Then write them as `01-<slug>.md`, `02-<slug>.md`, and so on in `.cortex/<task>/`.
 
 Signs it needs splitting: more than roughly a dozen criteria, more than one page or template, or a build step that has to finish before the next one can even be described.
 
-## 5. Write the ticket
+## 6. Write the ticket
 
 `.cortex/<task>/ticket.md`, or the numbered files if you split. Everything you write now sits above the divider and is frozen the moment you hand off.
 
@@ -132,7 +142,7 @@ Criteria are the definition of done, and they are also what the audit measures t
 
 Then read them back and ask: *if every one of these were ticked, could the screen still be wrong?* On the pilot the answer was yes — every criterion was satisfiable in a state where the bar showed $22.00 and the cart charged $18.70. If the answer is yes, there is a criterion missing.
 
-## 6. Record the scoping time
+## 7. Record the scoping time
 
 Add a Work Log row to the **vault task** for this session, marked as scoping.
 
@@ -140,7 +150,7 @@ Whether scoping is billable to the client or overhead is unsettled — flag the 
 
 **Propose the number; never finalise it.** Research you did quickly is not the client's to pay for.
 
-## 7. The completeness gate
+## 8. The completeness gate
 
 **Do not print the handoff until every question you asked and every finding you surfaced is in the ticket.**
 
@@ -167,7 +177,8 @@ Then set the task to `status: todo` and print:
 
 - **Never write a ticket without researching the repo first**, however clear the request seems. The clear ones are where the unexamined assumption hides.
 - **Never ask what the repo can answer.**
-- **Never invent a task.** The plugin reads them; Obsidian and Monday create them.
+- **Never fill a gap inline that a capture move exists to fill.** Name the hole, name the move, and stop.
+- **Never invent a task.** Only `/create-tasks` authors one, and only with sign-off.
 - **Never overwrite an existing ticket.** Above the divider is written once. Changed work is a new ticket.
 - **Never write a criterion you could not observe in a browser.** If it cannot be observed, it is a decision, and it goes in Decisions where nobody will be tempted to tick it.
 - **Never invent or adjust `rate`, `billed`, or `invoice`.**

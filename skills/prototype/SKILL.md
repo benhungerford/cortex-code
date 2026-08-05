@@ -71,6 +71,6 @@ branch: prototype/sticky-bar-variants
 ## Guardrails
 
 - **Never leave prototype code on the default branch.** It is throwaway by definition, and the default branch is not a place throwaway code sits "for now."
-- **Never let a prototype grow error handling or tests.** The moment it needs those, it has stopped being a question and started being a feature — and features go through `/ticket` and `/build`, not this move.
+- **Never let a prototype grow error handling or tests.** The moment it needs those, it has stopped being a question and started being a feature — and features go through `/create-tickets` and `/build`, not this move.
 - **Never record a verdict the human did not give.** The UI and behaviour branches both exist to be reacted to; a prototype nobody looked at has no verdict, and a pointer file written before anyone saw the code is a guess wearing a verdict's formatting.
 - **Never keep a prototype alive as production code because it worked.** Working is not the same as built to last. Fold the validated decision into the real work instead of promoting the shortcut itself.
