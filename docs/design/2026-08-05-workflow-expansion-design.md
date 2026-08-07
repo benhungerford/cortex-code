@@ -105,7 +105,7 @@ Three capture moves, invoked from ideation or directly against a task. Their wri
 
 Most invocations will be the first. The moves are the same either way.
 
-**`/grill-me`** — a relentless interview, one question at a time, each with a recommended answer. Facts discoverable from the filesystem or tools are looked up rather than asked; decisions are always put to the human and waited on. It does not act until shared understanding is confirmed.
+**`/grill-me`** — a relentless interview that maps the work as a design tree and works it in rounds, asking the whole frontier at once, each question numbered and carrying a recommended answer. Facts in the repo or reachable by tool are found by a dispatched sub-agent rather than asked for; anything needing a primary source routes to `/research` instead, so it lands cited. Decisions are always put to the human and waited on, and it does not act until shared understanding is confirmed.
 
 **`/research`** — a background agent investigating against primary sources: Shopify dev docs, theme source, first-party app documentation. Never a secondary write-up. Findings land as one cited Markdown file per question.
 
