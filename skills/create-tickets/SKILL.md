@@ -1,6 +1,6 @@
 ---
 name: create-tickets
-description: Assemble one or more build tickets from the task, its capture folder, and the foundation files — routing back when something is missing. Usage:/create-tickets TT-06
+description: Assemble one or more build tickets from the task, its capture folder, and the foundation files — routing back when something is missing. Usage:/create-tickets why-regenerative
 disable-model-invocation: true
 ---
 
@@ -16,9 +16,13 @@ This move assembles. The capture moves — `/grill-me`, `/research`, `/prototype
 
 ## Inputs
 
-`/create-tickets <task>` — e.g. `/create-tickets TT-06`. Optional, and it is normal to hand it more than the ID.
+`/create-tickets <task>` — e.g. `/create-tickets why-regenerative`. Optional, and it is normal to hand it more than the name.
 
-**With no argument:** read the vault `Tasks/` folder named by `docs/agents/issue-tracker.md`, list every task at `todo` that has no ticket in `.cortex/` yet, and ask which. Do not pick one silently.
+Tasks are named, not numbered, and the argument is matched against the slug in a task's `cortex:` key by prefix — `why-reg` finds `why-regenerative`. Names share prefixes far more often than sequential IDs did, so **when more than one task matches, list the matches and ask.** Never take the first.
+
+**Resolving the vault project.** Prefer what Cortex boot already resolved — the `<cortex-session>` block in context names the vault path and the active project, and at L3 it is fully resolved before the first message. With no block, call `find_project_by_cwd` from `cortex-vault`. Read `docs/agents/issue-tracker.md` only when neither resolves. From a resolved project both paths follow by convention: tasks are `<project>/Tasks/`, tickets are `<repo root>/.cortex/`. If a binding file names a different project than boot resolved, stop and say both — silently preferring either is how a stale binding gets worse instead of better. If nothing resolves, stop and say this repo has not been registered with Cortex; `/cortex-register-repo` is the move that binds it.
+
+**With no argument:** read the resolved `Tasks/` folder, list every task at `todo` that has no ticket in `.cortex/` yet, and ask which. Do not pick one silently.
 
 **If the named task does not exist in the vault:** stop. The plugin reads tasks; it does not invent them — a task is a billing record, and only `/create-tasks` authors one, only with sign-off. Say what is missing and what its frontmatter needs. Never create a task as a side effect of being asked for a ticket.
 
@@ -30,7 +34,7 @@ Whatever came with the command — a paragraph of detail, a live URL, a Figma li
 
 Read in this order. The order matters — each layer narrows what the next one has to establish, and reading the repo before reading the capture folder means re-deriving facts somebody already wrote down.
 
-1. **The task**, followed from wherever `docs/agents/issue-tracker.md` names. Its frontmatter carries `cortex:`, the pointer to the capture folder. Read its `## From the map` section: those decisions are already made, and they are not to be relitigated here. A ticket that reopens a settled map decision spends the human's attention on a question they already answered.
+1. **The task**, in the resolved `Tasks/` folder. Its frontmatter carries `cortex:`, the pointer to the capture folder — read the folder path out of that key rather than slugging the task's title yourself. The title is display and may have been reworded since; `cortex:` is the contract and has not. Read its `## From the map` section: those decisions are already made, and they are not to be relitigated here. A ticket that reopens a settled map decision spends the human's attention on a question they already answered.
 
 2. **Every file in `.cortex/<task>/`** — `grill-*.md`, `research-*.md`, `prototype-*.md`. Read all of them, including the ones that look tangential. Two things in that folder are worth more than the rest: a `Still open` entry in a grill transcript, because it is a question the human deliberately declined to answer and it may be exactly what blocks this ticket; and a `What this rules out` section in a research file, because it closes options you would otherwise spend the ticket weighing.
 
@@ -101,12 +105,12 @@ Signs it needs splitting: more than roughly a dozen criteria, more than one page
 
 ```markdown
 ---
-task: TT-06
+task: sticky-add-to-cart
 ticket: 01
 created: 2026-08-06
 ---
 
-# TT-06 — Sticky add-to-cart on mobile PDP
+# Sticky add-to-cart on mobile PDP
 
 ## Intent
 

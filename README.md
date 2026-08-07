@@ -35,7 +35,9 @@ One task has one or more tickets. Usually one. A homepage is one invoice and fiv
 
 The order above is a default, not a gate. Tasks may exist before ideation runs, and often will — a client sends a list, and you ideate each item. Ideation may equally run first and produce the tasks. `/create-tickets` reads whatever exists and does not care which came first. Foundation and ideation are both skippable; a thirty-minute CSS fix goes straight to `/create-tickets`, and when it is unclear the move asks.
 
-The task ID is the only argument most moves take, and it is optional — with no argument each move lists what is ready and asks. Repo path, vault project, ticket folder, and stage are all derived.
+The task name is the only argument most moves take, and it is optional — with no argument each move lists what is ready and asks. Repo path, vault project, ticket folder, and stage are all derived.
+
+Tasks are named for what they are — `Why Regenerative`, `Homepage` — not numbered. The kebab-case slug of that name is the key: it names the capture folder, it is what every grill, research, and ticket file carries to point back at the task, and it is written into the task's `cortex:` key once, at creation. Moves read the folder path out of that key rather than re-slugging the title, so a task can be retitled — or a Monday item's name can drift — without breaking anything underneath it.
 
 A move boundary is a context boundary: every move starts cold with its file as the only input, which is what forces that file to be complete. A move may not print its handoff until every question asked and every finding surfaced is in the file, because after the clear there is no transcript to recover them from.
 
@@ -67,7 +69,11 @@ Upstream's `implement` is eight lines that delegate to `tdd`, typechecking, and 
 ## Requirements
 
 - The [`cortex-vault`](https://github.com/benhungerford/claude-cortex) MCP server, for resolving a repo to its vault project
-- A `docs/agents/issue-tracker.md` in each repo, naming that project's vault `Tasks/` folder and the repo's `.cortex/` ticket path
+- Each repo registered with Cortex, via `/cortex-register-repo`
+
+Registering is the whole binding step. Cortex boot resolves the repo to its vault project and puts it in context before the first message, so the moves read what boot already resolved, fall back to `find_project_by_cwd` where boot could not run, and derive the rest by convention — tasks are `<project>/Tasks/`, tickets are `<repo root>/.cortex/`.
+
+A hand-authored `docs/agents/issue-tracker.md` still works and is read last, but it is no longer required and nothing produces it. Where one exists and names a different project than Cortex resolved, the moves stop and say both rather than picking — a stale binding preferred silently is worse than one surfaced.
 
 ## The task is a billing record
 

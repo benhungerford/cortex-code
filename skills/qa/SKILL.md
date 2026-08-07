@@ -1,6 +1,6 @@
 ---
 name: qa
-description: Walk a ticket's criteria in a browser, tick only what you observe, append the round with origin tags, and take it to sign-off. Usage:/qa TT-06
+description: Walk a ticket's criteria in a browser, tick only what you observe, append the round with origin tags, and take it to sign-off. Usage:/qa why-regenerative
 disable-model-invocation: true
 ---
 
@@ -10,7 +10,7 @@ Walk the ticket's acceptance criteria, append what you found, and take the work 
 
 This is the billing boundary. A task that reaches `done` is money owed, and the QA rounds on its ticket are the only durable record of what was actually checked. Everything here exists to keep that record true.
 
-`/qa <task>` — e.g. `/qa TT-06`. Optional; with no argument, list the tasks at `status: review` and ask which.
+`/qa <task>` — e.g. `/qa why-regenerative`. Optional; with no argument, list the tasks at `status: review` and ask which. Tasks are named, not numbered — match the argument against the slug in each task's `cortex:` key by prefix, and when more than one matches, list the matches and ask rather than taking the first.
 
 ## The failure mode this skill is built against
 
@@ -26,7 +26,9 @@ The test: *can you say what you saw?* "The cart line came back with `selling_pla
 
 ## 1. Read the ticket
 
-Find it via `docs/agents/issue-tracker.md`, then read `.cortex/<task>/`. The ticket is `ticket.md`, or `NN-<slug>.md` where the task was split. Everything else in that folder — `grill-*.md`, `research-*.md`, `prototype-*.md` — is capture, read for context only, and a grill's `## Still open` entry is a question the human declined to answer rather than part of the brief.
+**Resolving the vault project.** Prefer what Cortex boot already resolved — the `<cortex-session>` block in context names the vault path and the active project, and at L3 it is fully resolved before the first message. With no block, call `find_project_by_cwd` from `cortex-vault`. Read `docs/agents/issue-tracker.md` only when neither resolves. From a resolved project both paths follow by convention: tasks are `<project>/Tasks/`, tickets are `<repo root>/.cortex/`. If a binding file names a different project than boot resolved, stop and say both — silently preferring either is how a stale binding gets worse instead of better. If nothing resolves, stop and say this repo has not been registered with Cortex; `/cortex-register-repo` is the move that binds it.
+
+Then read the capture folder at the path the task's `cortex:` key names — read it out of that key rather than slugging the task's title yourself. The ticket is `ticket.md`, or `NN-<slug>.md` where the task was split. Everything else in that folder — `grill-*.md`, `research-*.md`, `prototype-*.md` — is capture, read for context only, and a grill's `## Still open` entry is a question the human declined to answer rather than part of the brief.
 
 Read Intent, Decisions, and Criteria above the divider, then every round below it. The most recent Build round tells you what the builder claims and what they say they did not check. **Do not treat their unchecked list as authoritative in either direction** — they may have missed something they thought they covered, and they may have fixed something they forgot to mention.
 

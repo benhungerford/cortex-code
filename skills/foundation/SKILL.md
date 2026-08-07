@@ -12,9 +12,11 @@ disable-model-invocation: true
 
 `/foundation` takes no argument.
 
-If `docs/agents/issue-tracker.md` does not exist, stop and say so — this repo has not been bound to a vault project.
+**Resolving the vault project.** Prefer what Cortex boot already resolved — the `<cortex-session>` block in context names the vault path and the active project, and at L3 it is fully resolved before the first message. With no block, call `find_project_by_cwd` from `cortex-vault`. Read `docs/agents/issue-tracker.md` only when neither resolves. From a resolved project both paths follow by convention: tasks are `<project>/Tasks/`, tickets are `<repo root>/.cortex/`. If a binding file names a different project than boot resolved, stop and say both — silently preferring either is how a stale binding gets worse instead of better. If nothing resolves, stop and say this repo has not been registered with Cortex; `/cortex-register-repo` is the move that binds it.
 
-Otherwise, detect the platform before scanning anything else. A `config/settings_schema.json` alongside `layout/theme.liquid` means Shopify. A `style.css` carrying a theme header, or a `theme.json`, means WordPress. State which branch you took and what you matched on before doing any further reading — the rest of the scan depends on it, and a wrong guess here produces a shaped-for-the-wrong-platform file that looks complete and is not.
+**The scan root is not always the repo root.** The vault binding belongs to the checkout as a whole, and it resolves from the repo root. What you scan may sit well below it — a WordPress theme inside a `wp-content` tree has its git root several levels above `themes/<theme>/`, and platform detection run at the git root finds no WordPress markers and takes the wrong branch. Detect the platform where the theme actually lives, and say which directory you scanned as well as which branch you took.
+
+Then detect the platform before scanning anything else. A `config/settings_schema.json` alongside `layout/theme.liquid` means Shopify. A `style.css` carrying a theme header, or a `theme.json`, means WordPress. State which branch you took and what you matched on before doing any further reading — the rest of the scan depends on it, and a wrong guess here produces a shaped-for-the-wrong-platform file that looks complete and is not.
 
 ## Preconditions
 
@@ -76,5 +78,5 @@ Read `theme.json` for tokens and supported settings, `style.css` for the theme h
 - Never write a claim you cannot cite with `file:line`.
 - Never guess a render signature from a snippet's or block's name. Read the parameters it actually uses.
 - Never overwrite a file with fewer facts than it already had. A re-run that loses detail is a regression, not a refresh — later builds append to these files as they go, so re-runs of `/foundation` itself are additive unless the thing a section describes has genuinely changed underneath it.
-- Never scan a repo that has not been bound to a vault project.
-- Never let a platform guess stand unstated. Say what you matched on before you scan.
+- Never scan a repo that resolves to no vault project. Point at `/cortex-register-repo` rather than at a missing file.
+- Never let a platform guess stand unstated. Say what you matched on, and which directory you matched it in, before you scan.
