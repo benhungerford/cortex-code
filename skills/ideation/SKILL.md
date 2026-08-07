@@ -66,7 +66,7 @@ Four, and the type names which move resolves the question:
 
 - **research** — a fact a decision is waiting on, resolved by `/research` as a background agent. The only type that may run in parallel with others, since following a source back to itself doesn't need the human's attention while it happens.
 - **prototype** — resolved by `/prototype`, for whenever "how should it look" or "how should it behave" is the actual question.
-- **grilling** — resolved by `/grill-me`. The default case: a decision only the human can make, walked one question at a time.
+- **grilling** — resolved by `/grill-me`. The default case: a decision only the human can make, worked as a design tree in rounds.
 - **task** — manual work that has to happen before a decision can be made at all: signing up for a service so its API can be judged, provisioning access, getting the client to send the promised assets. There is nothing to decide here, but the discussion is blocked until it's done. It's the one type that *does* rather than decides, and it earns its place on the map by unblocking a decision that would otherwise stall. It resolves when the work is done, and its answer records what was done and any facts later questions depend on.
 
 ## Fog of war
