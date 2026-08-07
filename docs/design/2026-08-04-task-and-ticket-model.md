@@ -2,6 +2,8 @@
 
 *2026-08-04 — design agreed, not yet implemented. Supersedes the single-file ticket model that `0.2.0` shipped against.*
 
+> **Amended 2026-08-07 on two points, and left otherwise as written.** Task IDs are gone — tasks are named for what they are and keyed by the slug of that name, per [`2026-08-07-semantic-task-names.md`](2026-08-07-semantic-task-names.md), so the `AC-01` in the tree below would now read `Currency selector flag bloat` with a `currency-selector-flag-bloat` slug. And `docs/agents/issue-tracker.md` is no longer the binding: the repo resolves to its vault project through Cortex boot, with the file read last and only as a fallback, per [`2026-08-07-vault-awareness-from-cortex-boot.md`](2026-08-07-vault-awareness-from-cortex-boot.md). Everything else here still holds.
+
 ## What changed
 
 `0.2.0` has one durable object: a ticket in the vault that is simultaneously the spec, the agent's brief, the QA checklist, and the billing record. That worked on the pilot and it does not survive contact with the rest of the work.

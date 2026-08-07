@@ -1,6 +1,6 @@
 ---
 name: research
-description: Investigate a question against primary sources in a background agent and capture the findings as a cited file. Usage:/research TT-06 <question>
+description: Investigate a question against primary sources in a background agent and capture the findings as a cited file. Usage:/research why-regenerative <question>
 disable-model-invocation: true
 ---
 
@@ -12,7 +12,7 @@ This is one of three capture moves — alongside `grill-me` and `prototype` — 
 
 ## Inputs
 
-`/research <task> <question>` writes to `.cortex/<task>/`. `/research <question>`, invoked inside an ideation session, writes to `.cortex/ideation/<effort>/`, taking the effort slug from the map rather than deriving one here. Same two-home rule as `grill-me`: with neither a task nor an ideation session to place it in, ask which before starting rather than guessing. A findings file written to the wrong folder is a findings file no later move will find.
+`/research <task> <question>` writes to the capture folder the task's `cortex:` key names — read the path out of that key rather than slugging the task's title yourself. `/research <question>`, invoked inside an ideation session, writes to `.cortex/ideation/<effort>/`, taking the effort slug from the map rather than deriving one here. Same two-home rule as `grill-me`: with neither a task nor an ideation session to place it in, ask which before starting rather than guessing. A findings file written to the wrong folder is a findings file no later move will find.
 
 ## Spin up a background agent
 
@@ -41,7 +41,7 @@ Write to `.cortex/<task>/research-NN-<slug>.md`, or `.cortex/ideation/<effort>/r
 
 ```markdown
 ---
-task: TT-06
+task: why-regenerative
 question: Does the Loop widget expose a selling_plan change event?
 researched: 2026-08-05
 ---

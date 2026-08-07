@@ -1,6 +1,6 @@
 ---
 name: grill-me
-description: A relentless interview that works the design tree in rounds, asking the whole frontier at once and writing the answers down as they come. Usage:/grill-me TT-06
+description: A relentless interview that works the design tree in rounds, asking the whole frontier at once and writing the answers down as they come. Usage:/grill-me why-regenerative
 disable-model-invocation: true
 ---
 
@@ -12,7 +12,7 @@ This is one of three capture moves — alongside `research` and `prototype` — 
 
 ## Inputs
 
-`/grill-me <task>` writes to `.cortex/<task>/`. `/grill-me` with no argument, invoked inside an ideation session, writes to `.cortex/ideation/<effort>/`, taking the effort slug from the map rather than deriving one here. With neither a task nor an ideation session to place it in, ask which before starting. Do not guess a home — a transcript written to the wrong folder is a transcript no later move will find.
+`/grill-me <task>` writes to the capture folder the task's `cortex:` key names — read the path out of that key rather than slugging the task's title yourself. `/grill-me` with no argument, invoked inside an ideation session, writes to `.cortex/ideation/<effort>/`, taking the effort slug from the map rather than deriving one here. With neither a task nor an ideation session to place it in, ask which before starting. Do not guess a home — a transcript written to the wrong folder is a transcript no later move will find.
 
 ## How to grill
 
@@ -52,15 +52,15 @@ Batching makes this matter more, not less. A round of eight answers is where par
 
 ## The transcript
 
-Write to `.cortex/<task>/grill-NN.md` when a task is named, or `.cortex/ideation/<effort>/grill-NN.md` when invoked from a map question. `NN` is zero-padded and increments from the highest existing file already in that folder.
+Write to `.cortex/<task>/grill-NN.md` when a task is named, or `.cortex/ideation/<effort>/grill-NN.md` when invoked from a map question. `NN` is zero-padded and increments from the highest existing file already in that folder. `task:` carries the task's slug, because it is the join key back to the task; the heading carries the task's title, because that is what a cold reader needs to see.
 
 ```markdown
 ---
-task: TT-06
+task: why-regenerative
 grilled: 2026-08-05
 ---
 
-# Grill — TT-06
+# Grill — Why Regenerative
 
 ## Settled
 

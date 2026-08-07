@@ -18,7 +18,9 @@ Ideation produces decisions, not deliverables. Each question resolves a decision
 
 ## The map
 
-A note in the active vault project, resolved through `docs/agents/issue-tracker.md`. It is an index, not a store: a decision lives in exactly one place, its question, and the map gists and links rather than restating what the question already says. The body, verbatim:
+A note in the active vault project. Prefer what Cortex boot already resolved — the `<cortex-session>` block in context names the vault path and the active project. With no block, call `find_project_by_cwd` from `cortex-vault`. Read `docs/agents/issue-tracker.md` only when neither resolves, and when nothing resolves, say this repo has not been registered with Cortex and point at `/cortex-register-repo`. Ideation often runs before a repo exists at all, in which case there is nothing to resolve from and the active project is simply the one you ask for.
+
+The map is an index, not a store: a decision lives in exactly one place, its question, and the map gists and links rather than restating what the question already says. The body, verbatim:
 
 ```markdown
 ## Destination

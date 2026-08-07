@@ -1,6 +1,6 @@
 ---
 name: build
-description: Implement a repo ticket against its criteria and verify it in a real browser. For theme work with no test runner. Usage:/build TT-06
+description: Implement a repo ticket against its criteria and verify it in a real browser. For theme work with no test runner. Usage:/build why-regenerative
 disable-model-invocation: true
 ---
 
@@ -22,17 +22,19 @@ You build from the ticket. You bill against the task. Never re-derive scope from
 
 ## Inputs
 
-`/build <task>` — e.g. `/build TT-06`. Optional.
+`/build <task>` — e.g. `/build why-regenerative`. Optional.
 
-**With no argument:** read the vault `Tasks/` folder named by `docs/agents/issue-tracker.md`, list every task at `todo` or `in-progress` with its status and estimate, and ask which. Do not pick one silently.
+**Resolving the vault project.** Prefer what Cortex boot already resolved — the `<cortex-session>` block in context names the vault path and the active project, and at L3 it is fully resolved before the first message. With no block, call `find_project_by_cwd` from `cortex-vault`. Read `docs/agents/issue-tracker.md` only when neither resolves. From a resolved project both paths follow by convention: tasks are `<project>/Tasks/`, tickets are `<repo root>/.cortex/`. If a binding file names a different project than boot resolved, stop and say both — silently preferring either is how a stale binding gets worse instead of better. If nothing resolves, stop and say this repo has not been registered with Cortex; `/cortex-register-repo` is the move that binds it.
+
+**With no argument:** read the resolved `Tasks/` folder, list every task at `todo` or `in-progress` with its status and estimate, and ask which. Do not pick one silently.
 
 **With a task that has several tickets:** take the lowest-numbered `NN-<slug>.md` ticket that is not yet accepted, and say which one you took before doing anything else. `/build homepage 02` overrides.
 
-If `docs/agents/issue-tracker.md` does not exist, stop and say so — this repo has not been bound to a vault project.
-
 ## 1. Read the ticket. It is the contract.
 
-Resolve the task ID by prefix match, then read `.cortex/<task>/`.
+Tasks are named, not numbered. Match the argument against the slug in each task's `cortex:` key by prefix — `why-reg` finds `why-regenerative` — and **when more than one task matches, list the matches and ask.** Names share prefixes far more often than sequential IDs did, so taking the first match is how you build the wrong thing.
+
+Then read the capture folder at the path `cortex:` names. Read it out of that key rather than slugging the task's title yourself: the title is display and may have been reworded, and re-deriving the folder from it is what would make a rename break the link.
 
 The ticket is `ticket.md`, or `NN-<slug>.md` where the task was split. Everything else in that folder — `grill-*.md`, `research-*.md`, `prototype-*.md` — is capture, read for context only, and a grill's `## Still open` entry is a question the human declined to answer rather than part of the brief.
 

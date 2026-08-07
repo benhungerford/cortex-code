@@ -1,6 +1,6 @@
 ---
 name: prototype
-description: Build throwaway code that answers a design or behaviour question — UI variants on one route, or real theme state driven in a browser. Usage:/prototype TT-06 <question>
+description: Build throwaway code that answers a design or behaviour question — UI variants on one route, or real theme state driven in a browser. Usage:/prototype why-regenerative <question>
 disable-model-invocation: true
 ---
 
@@ -12,7 +12,7 @@ This is the last of three capture moves — alongside `grill-me` and `research` 
 
 ## Inputs
 
-`/prototype <task> <question>` writes its pointer file to `.cortex/<task>/`. `/prototype <question>`, invoked inside an ideation session, writes to `.cortex/ideation/<effort>/`, taking the effort slug from the map rather than deriving one here. Same rule as its siblings: with neither a task nor an ideation session to place it in, ask which before starting rather than guessing. A pointer file in the wrong folder points nowhere a later move will look, and a prototype without a pointer is a branch nobody will ever find again.
+`/prototype <task> <question>` writes its pointer file to the capture folder the task's `cortex:` key names — read the path out of that key rather than slugging the task's title yourself. `/prototype <question>`, invoked inside an ideation session, writes to `.cortex/ideation/<effort>/`, taking the effort slug from the map rather than deriving one here. Same rule as its siblings: with neither a task nor an ideation session to place it in, ask which before starting rather than guessing. A pointer file in the wrong folder points nowhere a later move will look, and a prototype without a pointer is a branch nobody will ever find again.
 
 ## Pick a branch
 
@@ -50,7 +50,7 @@ Write to `.cortex/<task>/prototype-NN-<slug>.md`, or `.cortex/ideation/<effort>/
 
 ```markdown
 ---
-task: TT-06
+task: why-regenerative
 prototyped: 2026-08-05
 branch: prototype/sticky-bar-variants
 ---
