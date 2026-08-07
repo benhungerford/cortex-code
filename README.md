@@ -112,7 +112,11 @@ Two things fall out. A returning build session opens one file and sees the origi
 
 ## Status
 
-`2.1.0` — the full chain, from a loose idea to a signed-off build. Nine moves: `foundation`, `ideation`, `grill-me`, `research`, `prototype`, `create-tasks`, `create-tickets`, `build`, `qa`, written against the task/ticket model in [`docs/design/2026-08-04-task-and-ticket-model.md`](docs/design/2026-08-04-task-and-ticket-model.md) and the expansion in [`docs/design/2026-08-05-workflow-expansion-design.md`](docs/design/2026-08-05-workflow-expansion-design.md).
+`2.2.0` — the full chain, from a loose idea to a signed-off build. Nine moves: `foundation`, `ideation`, `grill-me`, `research`, `prototype`, `create-tasks`, `create-tickets`, `build`, `qa`, written against the task/ticket model in [`docs/design/2026-08-04-task-and-ticket-model.md`](docs/design/2026-08-04-task-and-ticket-model.md) and the expansion in [`docs/design/2026-08-05-workflow-expansion-design.md`](docs/design/2026-08-05-workflow-expansion-design.md).
+
+`2.2.0` removed two identifiers. Tasks are named for what they are and keyed by the slug of that name, per [`docs/design/2026-08-07-semantic-task-names.md`](docs/design/2026-08-07-semantic-task-names.md). And the repo resolves to its vault project through Cortex boot rather than a hand-authored binding file, per [`docs/design/2026-08-07-vault-awareness-from-cortex-boot.md`](docs/design/2026-08-07-vault-awareness-from-cortex-boot.md).
+
+**Tasks written under `2.1.0` need renaming.** A `task: TT-06` and its `cortex: .cortex/TT-06/` still resolve — nothing reads the ID as an ID — but they carry a name that tells a cold session nothing, which is the cost this version removed. Renaming one is a vault edit and a folder move, not something a move does for you.
 
 Measured always-on cost is **521 tokens** across the nine — 50 to 70 each, per `claude plugin details cortex-code`. Bodies cost 1.3k to 4.2k tokens each *on invocation only*, because every skill is `disable-model-invocation: true` and nothing fires them by accident.
 
