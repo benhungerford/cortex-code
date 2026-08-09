@@ -53,7 +53,7 @@ scanned:
 
 ## Evidence rules
 
-Every claim carries a `file:line` citation. Anything inferred rather than directly observed is marked `(inferred)` and says what it was inferred from. This is the same discipline `qa` applies when it refuses to tick a criterion it did not see happen — a document later moves trust without re-checking cannot afford to be generous with itself. If you cannot point at the line that supports a claim, the claim does not go in the file. A shorter file that is entirely true is worth more than a fuller one that is half guessed.
+Every claim carries a `file:line` citation. Anything inferred rather than directly observed is marked `(inferred)` and says what it was inferred from. This is the same discipline `qa` applies when it refuses to tick an item it did not see happen — a document later moves trust without re-checking cannot afford to be generous with itself. If you cannot point at the line that supports a claim, the claim does not go in the file. A shorter file that is entirely true is worth more than a fuller one that is half guessed.
 
 ## What each file must contain
 

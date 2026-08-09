@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Write the file a cold build session will work from.
 
-Everything downstream is only as good as this. `/build` reads the ticket and nothing else; `/qa` walks the criteria this move wrote. A vague ticket does not produce a vague build — it produces a confident build of the wrong thing, and the cost surfaces two rounds later as findings tagged `found by QA`.
+Everything downstream is only as good as this. `/build` reads the ticket and loops on the criteria until they pass or are blocked; `/qa` never re-walks them, so a criterion this move fails to write is a criterion nothing downstream checks. A vague ticket does not produce a vague build — it produces a confident build of the wrong thing, and the cost surfaces two rounds later as findings tagged `found by QA`.
 
 So this move is allowed to be expensive. It is the one place in the workflow where thoroughness is cheaper than speed.
 

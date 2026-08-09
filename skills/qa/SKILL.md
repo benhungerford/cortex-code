@@ -12,7 +12,7 @@ Collect what the ticket missed, append what you found, and send it back to `/bui
 
 `/qa` is another way to add to the ticket. It happens to run after the build rather than before it. `/build` already reads it that way — its step 1 treats every unresolved item from the most recent QA round as the actual work list for a return visit.
 
-This is the billing boundary. A task that reaches `done` is money owed, and the QA rounds on its ticket are the only durable record of what was actually checked. Everything here exists to keep that record true.
+This is the billing boundary. A task that reaches `done` is money owed, and the QA rounds on its ticket are the only durable record of what the ticket failed to anticipate — what Ben and the client asked for that nobody wrote down before the work started. Everything here exists to keep that record true.
 
 `/qa <task>` — e.g. `/qa why-regenerative`. Optional; with no argument, list the tasks at `status: review` and ask which. Tasks are named, not numbered — match the argument against the slug in each task's `cortex:` key by prefix, and when more than one matches, list the matches and ask rather than taking the first.
 
@@ -38,9 +38,9 @@ Read Intent, Decisions, and Criteria above the divider, then every round below i
 
 ## 2. Rebuild the environment
 
-Stand up whatever the ticket's "How this gets verified" section specifies. If you cannot — auth is broken, a service is down, bot protection is tripped — **stop and say so**. Do not review the diff instead and call it QA. A diff review is a different, weaker activity, and recording it as criteria-walking corrupts the record.
+Stand up whatever the ticket's "How this gets verified" section specifies — this feeds the fifth collection source only, what you find by looking at the screen. If you cannot — auth is broken, a service is down, bot protection is tripped — do not stop the round. Collect the four sources that need no browser (Ben's edits, Pastel comments, client feedback, criteria `/build` reported as blocked) as normal, record in the round that the screen was not examined and why, and still end at the explicit ask in section 7. What you must never do is review the diff instead and call it a look at the screen — a diff review is a different, weaker activity, and recording it as screen-truth corrupts the record.
 
-The browser rules from `build` apply unchanged: use a real rendering browser rather than an embedded pane, batch every assertion for a page state into one evaluation, capture the request rather than the appearance for anything transactional, and suspect anything a third-party app owns.
+Where the environment does stand up, the browser rules from `build` apply unchanged: use a real rendering browser rather than an embedded pane, batch every assertion for a page state into one evaluation, capture the request rather than the appearance for anything transactional, and suspect anything a third-party app owns.
 
 ## 3. Collect
 
@@ -53,6 +53,8 @@ Gather from every source that has an opinion:
 - What you find by looking at the screen
 
 Try any blocked criterion this session can exercise — a different environment or a real device may reach what the build session could not. If it still cannot be exercised, carry the item forward with its reason rather than dropping it. Each blocked criterion carried forward becomes its own item in the round, one line each with its own reason.
+
+If you do exercise a `blocked in build` item and observe it true, tick it. It keeps its `blocked in build` origin — that is where it came from — and the line notes where you finally exercised it: the device, environment, or condition that reached it. It does not get re-tagged `found by QA`; you did not find it, you cleared it. If you exercise it and observe it false, write it as a `**Fails.**` item, still with `blocked in build` origin, same as any other fail.
 
 **Does the screen tell the truth?**
 
@@ -84,6 +86,8 @@ Verified against `shopify theme dev` in Playwright at 320 / 390 / 430px.
 - [ ] **Fails.** Price should be hidden when no variant is chosen · from Pastel
 - [ ] Sold-out variant disables the button — *still no sold-out variant on the
       store; tried on staging too* · blocked in build
+- [x] Low-stock variant disables the button — *exercised on a real device this
+      round; staging had a variant at qty 1* · blocked in build
 ```
 
 **Every item carries an origin.** One of four:
@@ -143,7 +147,7 @@ Present, in this order:
 3. **Hours** — proposed total against estimate
 4. **The explicit ask:** send back to `/build`, or accept as it stands?
 
-Acceptance is the empty case. When a round collects nothing, the only thing left to ask is whether to accept.
+Acceptance is the empty case. When a round collects nothing, the only thing left to ask is whether to accept. A round carrying only a `blocked in build` item that no environment can reach is not the empty case — it collected something, it just cannot resolve it. Present it as it stands and let the human decide whether to accept with it open or send back anyway.
 
 **On send-back:** set the **task** to `status: in-progress` and print the existing handoff:
 
