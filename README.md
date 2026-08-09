@@ -98,25 +98,31 @@ None of these break a test. All of them break a customer.
 
 ## Why an agent may not tick its own boxes
 
-`qa` exists mostly to resist one pressure. On the pilot, sign-off ticked all sixteen acceptance criteria in a single pass — including five that the same document, in the same edit, recorded as never exercised. It did not feel like lying. The work was finished, the criteria were the plan, the plan had been followed.
+`build` owns the criteria completely. It loops — implement, verify in the browser, classify every criterion, fix the failures, go again — until every criterion passes or is blocked, or three rounds have run. `qa` walks none of them; its question is *was the ticket right?*, not *did the plan get followed?*
 
-So the rule is that a criterion may only be ticked if it was *observed* to be true, in that QA session, in a browser. The test is whether you can say what you saw. Deductions do not tick boxes, and unticked is a respectable outcome.
+The pilot is why that split exists. On it, sign-off ticked all sixteen acceptance criteria in a single pass — including five that the same document, in the same edit, recorded as never exercised. It did not feel like lying. The work was finished, the criteria were the plan, the plan had been followed. The rule that fixes it — an item may only be ticked if it was *observed* to be true, in that session, in a browser — used to govern a criteria walk. It now governs what QA writes into a round: the test is whether you can say what you saw, and deductions still do not tick boxes.
 
-`qa` also never fixes what it finds — failures go back to `/build` — and never moves a task to `done` without explicit acceptance.
+`qa` collects — from Ben's edits, Pastel comments, client feedback, criteria `/build` reported as blocked, and what QA finds by looking at the screen — and appends each item to the ticket with an origin tag. It never moves a task to `done` without explicit acceptance. Acceptance is the empty case: when a round collects nothing, the only thing left to ask is whether to accept.
 
 ## Why QA writes into the ticket
 
-QA is not limited to the criteria the ticket predicted. It appends its own findings, each tagged with where it came from — `from criteria`, `found by QA`, `from Pastel`, `from Ben`.
+Every item QA appends carries an origin — `found by QA`, `from Pastel`, `from Ben`, or `blocked in build` — and an optional `refines criterion N` when it sharpens something the ticket already asked for too loosely.
 
-Two things fall out. A returning build session opens one file and sees the original intent alongside the specific thing that broke. And a later audit can measure ticket quality directly: a ticket whose QA items all trace back to criteria was a good ticket; one carrying a lot of `found by QA` was underspecified, and one carrying a lot of `from Pastel` missed the client's expectations. Different failures, different fixes.
+The tag is what a later audit measures ticket quality against. A ticket carrying a lot of `found by QA` was technically underspecified — the ticket didn't ask. One carrying a lot of `refines criterion N` asked too loosely. One carrying a lot of `from Pastel` missed the client's expectations. Three failures, three fixes, and only the tag tells them apart.
+
+What QA learns at sign-off does not stay on the one ticket. Cross-project patterns — anything phraseable as a question `/create-tickets` should ask next time — land in `<vault>/Knowledge Base/ticket-gaps.md`. `/create-tickets` reads that file before the next ticket's criteria freeze, and a pattern that cost one project's QA round costs nothing on the next. That is the loop the origin tags were always pointing at and never closed.
 
 ## Status
 
-`2.2.0` — the full chain, from a loose idea to a signed-off build. Nine moves: `foundation`, `ideation`, `grill-me`, `research`, `prototype`, `create-tasks`, `create-tickets`, `build`, `qa`, written against the task/ticket model in [`docs/design/2026-08-04-task-and-ticket-model.md`](docs/design/2026-08-04-task-and-ticket-model.md) and the expansion in [`docs/design/2026-08-05-workflow-expansion-design.md`](docs/design/2026-08-05-workflow-expansion-design.md).
+`2.3.0` — the full chain, from a loose idea to a signed-off build. Nine moves: `foundation`, `ideation`, `grill-me`, `research`, `prototype`, `create-tasks`, `create-tickets`, `build`, `qa`, written against the task/ticket model in [`docs/design/2026-08-04-task-and-ticket-model.md`](docs/design/2026-08-04-task-and-ticket-model.md) and the expansion in [`docs/design/2026-08-05-workflow-expansion-design.md`](docs/design/2026-08-05-workflow-expansion-design.md).
+
+`2.3.0` splits build from QA along a cleaner line, per [`docs/design/2026-08-09-build-loop-and-qa-intake.md`](docs/design/2026-08-09-build-loop-and-qa-intake.md). `/build` now owns its criteria completely and loops on them itself — implement, verify, classify, fix, go again — instead of handing a ticked checklist to sign-off. `/qa` becomes pure intake: it collects from five sources and appends, and it never re-walks a criterion. What QA learns at sign-off feeds a cross-project ledger, `<vault>/Knowledge Base/ticket-gaps.md`, that `/create-tickets` reads before the next ticket's criteria freeze.
 
 `2.2.0` removed two identifiers. Tasks are named for what they are and keyed by the slug of that name, per [`docs/design/2026-08-07-semantic-task-names.md`](docs/design/2026-08-07-semantic-task-names.md). And the repo resolves to its vault project through Cortex boot rather than a hand-authored binding file, per [`docs/design/2026-08-07-vault-awareness-from-cortex-boot.md`](docs/design/2026-08-07-vault-awareness-from-cortex-boot.md).
 
 **Tasks written under `2.1.0` need renaming.** A `task: TT-06` and its `cortex: .cortex/TT-06/` still resolve — nothing reads the ID as an ID — but they carry a name that tells a cold session nothing, which is the cost this version removed. Renaming one is a vault edit and a folder move, not something a move does for you.
+
+**Tickets written under `2.2.0` carry `from criteria` tags.** They still read fine and nothing parses the tag mechanically, but they predate the split — a `from criteria` item was a criteria-walk finding, and `/qa` no longer produces criteria-walk findings. Leave them; rewriting a past round destroys the record it exists to be.
 
 Measured always-on cost is **521 tokens** across the nine — 50 to 70 each, per `claude plugin details cortex-code`. Bodies cost 1.3k to 4.2k tokens each *on invocation only*, because every skill is `disable-model-invocation: true` and nothing fires them by accident.
 
