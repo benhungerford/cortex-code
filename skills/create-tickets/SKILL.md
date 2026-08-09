@@ -87,6 +87,12 @@ Stopping is cheaper than continuing because each route-back is a fresh cold sess
 
 A task that arrived with no ideation behind it and an empty capture folder is the normal small-task path, not a gap. Repo research alone is often enough for it.
 
+### Ask what the last project taught you
+
+Read `<vault>/Knowledge Base/ticket-gaps.md`. This file may not exist — the ledger accumulates, and an early project has nothing in it yet. If it exists, pull the sections whose topic matches what this ticket covers. Each one is a question the last project's QA asked too late, and it resolves to a criterion, a Decision, or an explicit out-of-scope line in this ticket.
+
+A ledger question left unanswered is the same gap the ledger exists to record — that is how the same finding arrives twice. This is not a route-back: ask these questions here and now, in this session, unless the answer is genuinely one only the human can make. If it is, say so explicitly. Deferred questions route to `/grill-me`, but not as a side effect of reading the ledger.
+
 The counter-pressure matters just as much, or this becomes a machine for deferring. Research and the capture folder settle most things. Route back for what genuinely blocks a ticket — a decision the ticket cannot be written without, a fact a criterion depends on — not for every question you could imagine asking. A move that routes back on the third read of a well-captured folder has stopped assembling and started stalling.
 
 ## 5. Decide whether it is one sitting
@@ -171,6 +177,7 @@ Before handing off, check:
 - Every answer the human gave is written down, in their terms rather than your summary of them.
 - Every repo finding is in "What the repo says", with its file reference.
 - Every hazard has either a criterion or an explicit out-of-scope line.
+- Every `ticket-gaps.md` question matching this ticket's topics is answered in Criteria or Decisions, or written down as out of scope.
 - Every decision made in conversation is in Decisions.
 - "How this gets verified" names a real environment, and says what to do when it is unavailable.
 
