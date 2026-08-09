@@ -76,7 +76,7 @@ Anything wrong here is a finding even though no criterion covers it. It goes in 
 ```markdown
 ## QA — round 1 · 2026-08-09
 
-Verified against `shopify theme dev` in Playwright at 320 / 390 / 430px.
+Verified against `shopify theme dev` in Playwright at 320 / 390 / 430px. Checkout screen not examined — Shop Pay test session required device 2FA this pass.
 
 - [ ] **Fails.** Bar draws under the cart drawer at 390px — *`elementFromPoint`
       at the bar's centre returned the drawer overlay; separate stacking

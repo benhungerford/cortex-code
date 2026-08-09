@@ -98,7 +98,7 @@ None of these break a test. All of them break a customer.
 
 ## Why an agent may not tick its own boxes
 
-`build` owns the criteria completely. It loops — implement, verify in the browser, classify every criterion, fix the failures, go again — until every criterion passes or is blocked, or three rounds have run. A cap hit with real failures still standing holds the task at `in-progress` rather than handing off to `qa` — that state is not ready for a human to sign off, and `review` would misrepresent it. `qa` walks none of them; its question is *was the ticket right?*, not *did the plan get followed?*
+`build` owns the criteria completely. It loops — implement, verify in the browser, classify every criterion and every unresolved QA item, fix the failures, go again — until every criterion and every unresolved QA item passes or is blocked, or three rounds have run. A cap hit with real failures still standing holds the task at `in-progress` rather than handing off to `qa` — that state is not ready for a human to sign off, and `review` would misrepresent it. `qa` walks none of them; its question is *was the ticket right?*, not *did the plan get followed?*
 
 The pilot is why that split exists. On it, sign-off ticked all sixteen acceptance criteria in a single pass — including five that the same document, in the same edit, recorded as never exercised. It did not feel like lying. The work was finished, the criteria were the plan, the plan had been followed. The rule that fixes it — an item may only be ticked if it was *observed* to be true, in that session, in a browser — used to govern a criteria walk. It now governs what QA writes into a round: the test is whether you can say what you saw, and deductions still do not tick boxes.
 

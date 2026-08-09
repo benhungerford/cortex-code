@@ -179,7 +179,7 @@ Do not write a summary onto the task. That is written once, at sign-off, from th
 
 ## 9. Hand off
 
-Clean or blocked-only — every criterion passed or is blocked — stop with the task at `status: review`. Print the handoff:
+Clean or blocked-only — every criterion and every unresolved QA item passes or is blocked — stop with the task at `status: review`. Print the handoff:
 
 ```
 /clear
