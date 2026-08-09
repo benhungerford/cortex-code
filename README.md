@@ -108,7 +108,9 @@ The pilot is why that split exists. On it, sign-off ticked all sixteen acceptanc
 
 Every item QA appends carries an origin — `found by QA`, `from Pastel`, `from Ben`, or `blocked in build` — and an optional `refines criterion N` when it sharpens something the ticket already asked for too loosely.
 
-The tag is what a later audit measures ticket quality against. A ticket carrying a lot of `found by QA` was technically underspecified — the ticket didn't ask. One carrying a lot of `refines criterion N` asked too loosely. One carrying a lot of `from Pastel` missed the client's expectations. Three failures, three fixes, and only the tag tells them apart.
+The tag is what a later audit measures ticket quality against. A ticket carrying a lot of `found by QA` was technically underspecified — the ticket didn't ask. One carrying a lot of `from Pastel` missed the client's expectations. One carrying a lot of `blocked in build` ran out of environment before it ran out of ticket. Three failures, three fixes, and only the tag tells them apart.
+
+A second, optional axis rides after the origin tag: `refines criterion N`. It separates two ticket-creation failures the origin tag alone collapses into one — the ticket never mentioned this, versus the ticket asked for it but too loosely. The first means a question was never asked; the second means it was asked and answered imprecisely.
 
 What QA learns at sign-off does not stay on the one ticket. Cross-project patterns — anything phraseable as a question `/create-tickets` should ask next time — land in `<vault>/Knowledge Base/ticket-gaps.md`. `/create-tickets` reads that file before the next ticket's criteria freeze, and a pattern that cost one project's QA round costs nothing on the next. That is the loop the origin tags were always pointing at and never closed.
 
