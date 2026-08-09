@@ -64,7 +64,17 @@ Follow the ticket's stated approach. Prefer the platform's own data and events o
 
 ## 4. Verify in the browser
 
-This is the part that earns its keep. Work through the Criteria one at a time, plus every unresolved QA finding if this is a return round.
+Verification is a loop, not a pass. Each round: implement, verify in the browser, classify every criterion and every unresolved QA item, fix the failures, go again.
+
+| | Means |
+|---|---|
+| **Pass** | Observed true this round. |
+| **Fail** | Exercised and false. This is the round's work list. |
+| **Blocked** | Could not be exercised, with the reason. |
+
+Blocked is not failure and does not stall the loop. The pilot's *sold-out variant disables the button* had no sold-out variant on the store to test against, and no number of rounds produces one. Record why and move on.
+
+On a return round from `/qa`, every unresolved item in the most recent QA round joins the criteria as loop input, and it is gated on exactly the same terms as a criterion: passing means you observed it fixed, blocked means you say why it could not be exercised, and neither is the same as deciding not to fix it. Ben's `from Ben · refines criterion 3` item does not clear itself by being mentioned in the round — it clears by being observed true or provably blocked, same as a criterion that started the round failing.
 
 ### Use a real rendering browser
 
@@ -104,23 +114,39 @@ Criteria can pass while the screen is wrong. On the pilot the cart was always co
 
 Note which criteria you exercised and which you did not. You are not the one who ticks them — see below.
 
+### Exit conditions
+
+- Every criterion and every unresolved QA item passes or is blocked.
+- Three rounds have run. Whatever is not green is reported as it stands.
+- Bot protection trips, or the environment will not stand up. See `### Treat the browser as expensive` above.
+- A fix would require changing something above the divider. That is a conversation, not a decision the loop gets to make.
+
+The cap exists because a loop with no cap thrashes hardest on the bug it cannot solve, and every round costs a page load against a storefront that is already counting them.
+
 ## 5. Append the Build round to the ticket
+
+One Build round is appended per session, not one per iteration. Iterations are working state; the ticket is a record.
 
 Add a section at the end of the ticket. Never edit above the divider.
 
 ```markdown
-## Build — round 1 · 2026-08-06
+## Build — round 1 · 2026-08-09
 
-Moved the bar out of `main-product` into a root-level render so it shares a
-stacking context with the drawer. Added the no-variant price suppression.
+Three verify rounds. Moved the bar out of `main-product` into a root-level
+render so it shares a stacking context with the drawer, then added the
+no-variant price suppression after round 2 showed it flashing $0.00.
 
-Not addressed: the sold-out criterion — no sold-out variant exists on the
-store to test against.
+Caught by looking, not predicted by any criterion: the app's price node
+rewrites asynchronously after a variant change, so the first recompute
+raced it. Re-checks over a bounded window now.
+
+Blocked: the sold-out criterion — no sold-out variant exists on the store
+to test against.
 ```
 
-Say what you changed and why, and say plainly what you did not address and why. On a return round, answer the previous QA round item by item — an unanswered finding reads as an overlooked one.
+Say what you changed and why, and say plainly what you did not address and why. On a return round, resolve the previous QA round item by item — each one passes, is blocked with a reason, or is still failing and holds the handoff, on the same terms as a criterion. Answering an item is not resolving it; one you discuss but do not fix or block is still failing.
 
-If you found and fixed a bug that no criterion predicted, say so here. Those are the most useful lines in the file a year later, and they are also what the post-build audit reads to work out where the ticket came up short.
+If you found and fixed a bug that no criterion predicted, say so here. Those are the most useful lines in the file a year later, and this is what the post-build audit reads to work out where the ticket came up short, and it is the **only** place that count survives now that the loop fixes its own findings.
 
 ## 6. Keep the foundation current
 
@@ -153,13 +179,24 @@ Do not write a summary onto the task. That is written once, at sign-off, from th
 
 ## 9. Hand off
 
-Stop with the task at `status: review`. Print the handoff:
+Clean or blocked-only — every criterion and every unresolved QA item passes or is blocked — stop with the task at `status: review`. Print the handoff:
 
 ```
 /clear
 ```
 ```
 /qa <task>
+```
+
+Cap hit with failures still standing — the task **stays at `status: in-progress`**. Say what is still failing and ask. That state is not ready for a human to sign anything off, and moving it to `review` would misrepresent it.
+
+The next move on a held ticket is another `/build` session, not `/qa` — nothing here is ready for review. The 3-round cap is per session, not cumulative: a fresh session's loop starts at round 1 with a clean budget. Print the handoff:
+
+```
+/clear
+```
+```
+/build <task>
 ```
 
 ## Guardrails
@@ -169,7 +206,8 @@ The task is a billing record. The ticket is the evidence behind it.
 - **Never delete a task or a ticket.** Cancelled work is closed in place with the reason recorded.
 - **Never move a task to `done`.** `review` is as far as this skill goes. Only the human accepts.
 - **Never edit above the ticket's divider.** Intent, Decisions, and Criteria are frozen. Append.
-- **Never tick a criterion.** Ticking is the sign-off move's job, and an agent that ticks its own work ticks everything.
+- **Never tick a criterion.** No move ticks the frozen Criteria section — its checkboxes stay unticked by design, above the divider, forever. The record of what passed lives in the Build round below the divider, not in ticked boxes above it.
 - **Never invent or adjust `rate`, `billed`, or `invoice`.**
 - **Anything found after the human has reviewed** is disclosed and re-offered, never folded in silently. An approval covers the state the reviewer saw.
 - **Never let the foundation files drift from what you just built.**
+- **Never hand off at `review` with a criterion or an unresolved QA item still failing.** Blocked is a handoff. Failing is not — and an item merely answered without being fixed or blocked is still failing.

@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Write the file a cold build session will work from.
 
-Everything downstream is only as good as this. `/build` reads the ticket and nothing else; `/qa` walks the criteria this move wrote. A vague ticket does not produce a vague build — it produces a confident build of the wrong thing, and the cost surfaces two rounds later as findings tagged `found by QA`.
+Everything downstream is only as good as this. `/build` reads the ticket and loops on the criteria until they pass or are blocked; `/qa` never re-walks them, so a criterion this move fails to write is a criterion nothing downstream checks. A vague ticket does not produce a vague build — it produces a confident build of the wrong thing, and the cost surfaces two rounds later as findings tagged `found by QA`.
 
 So this move is allowed to be expensive. It is the one place in the workflow where thoroughness is cheaper than speed.
 
@@ -86,6 +86,12 @@ If it could, write it. If it could not, **name the specific hole, say which move
 Stopping is cheaper than continuing because each route-back is a fresh cold session with a single job, rather than a grill buried three thousand words into a research pass. A question asked in its own session gets the whole session's attention and lands in a file. A question asked mid-assembly gets whatever attention is left, and lands in a transcript that is about to be cleared. That is what removing the side trips buys.
 
 A task that arrived with no ideation behind it and an empty capture folder is the normal small-task path, not a gap. Repo research alone is often enough for it.
+
+### Ask what the last project taught you
+
+Read `<vault>/Knowledge Base/ticket-gaps.md`. This file may not exist — the ledger accumulates, and an early project has nothing in it yet. If it exists, pull the sections whose topic matches what this ticket covers. Each one is a question the last project's QA asked too late, and it resolves to a criterion, a Decision, or an explicit out-of-scope line in this ticket.
+
+A ledger question left unanswered is the same gap the ledger exists to record — that is how the same finding arrives twice. This is not a route-back: ask these questions here and now, in this session, unless the answer is genuinely one only the human can make. If it is, say so explicitly. Deferred questions route to `/grill-me`, but not as a side effect of reading the ledger.
 
 The counter-pressure matters just as much, or this becomes a machine for deferring. Research and the capture folder settle most things. Route back for what genuinely blocks a ticket — a decision the ticket cannot be written without, a fact a criterion depends on — not for every question you could imagine asking. A move that routes back on the third read of a well-captured folder has stopped assembling and started stalling.
 
@@ -171,6 +177,7 @@ Before handing off, check:
 - Every answer the human gave is written down, in their terms rather than your summary of them.
 - Every repo finding is in "What the repo says", with its file reference.
 - Every hazard has either a criterion or an explicit out-of-scope line.
+- Every `ticket-gaps.md` question matching this ticket's topics is answered in Criteria or Decisions, or written down as out of scope.
 - Every decision made in conversation is in Decisions.
 - "How this gets verified" names a real environment, and says what to do when it is unavailable.
 
