@@ -129,7 +129,6 @@ One Build round is appended per session, not one per iteration. Iterations are w
 
 Add a section at the end of the ticket. Never edit above the divider.
 
-````markdown
 ```markdown
 ## Build — round 1 · 2026-08-09
 
@@ -144,7 +143,6 @@ raced it. Re-checks over a bounded window now.
 Blocked: the sold-out criterion — no sold-out variant exists on the store
 to test against.
 ```
-````
 
 Say what you changed and why, and say plainly what you did not address and why. On a return round, answer the previous QA round item by item — an unanswered finding reads as an overlooked one.
 
