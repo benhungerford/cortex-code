@@ -1,6 +1,6 @@
 ---
 name: build
-description: Implement a repo ticket against its criteria and verify it in a real browser. For theme work with no test runner. Usage:/build why-regenerative
+description: Implement a repo ticket, then loop against a fresh checker agent that verifies it in a real browser until every criterion passes. For theme work with no test runner. Usage:/build why-regenerative
 disable-model-invocation: true
 ---
 
@@ -62,27 +62,54 @@ Follow the ticket's stated approach. Prefer the platform's own data and events o
 - If the platform publishes structured data on the page, read it rather than scraping rendered markup.
 - If an element already exists that does the thing, drive that element rather than duplicating its behaviour. Duplicating a form is how you silently lose a hidden input that some app owns.
 
-## 4. Verify in the browser
+## 4. Check with a fresh agent, fix, repeat
 
-Verification is a loop, not a pass. Each round: implement, verify in the browser, classify every criterion and every unresolved QA item, fix the failures, go again.
+This is a goal loop, not a fixed number of passes. It runs until the ticket passes.
+
+Each round:
+
+1. You implement.
+2. You spawn a **checker subagent** that verifies the work in a real browser against the ticket's criteria and returns a pass / fail / blocked list.
+3. You fix every item it returned failing.
+4. Go again — a new checker, from scratch.
+
+The loop ends when a checker returns a round with no failures. Not when you believe the work is done. **You do not grade your own build.** The checker's verdict is the only thing that closes the loop, and its browser session is the round's entire browser budget — you do not verify in parallel with it.
+
+### Spawning the checker
+
+One `Agent` call per round, synchronous (`run_in_background: false`) — you have nothing to do until the verdict lands. Use `subagent_type: Explore`: it cannot write files, which is exactly the guarantee you want from a checker. Fall back to `general-purpose` only if `Explore` is unavailable, and then state in the prompt that it must not edit any file.
+
+The checker starts with no memory of your reasoning, and that is the point. Give it:
+
+- The repo path, the ticket path, and the URL(s) to verify against.
+- Every criterion, **verbatim** from above the divider.
+- Every unresolved item from the most recent QA round, verbatim.
+- What changed this round — files touched, one line each. What you changed, not why it should work.
+- The browser rules below. They bind the checker as much as they bind you.
+
+Do not tell it what you expect to pass, and do not send it your own verification notes. A checker primed with your conclusion confirms your conclusion.
+
+Require it to return, per item: the criterion verbatim, a verdict, and **the observation behind the verdict**. A verdict with no observation is not a check — re-run the round. A `fail` says what it saw on the page, never what it inferred from reading the code.
 
 | | Means |
 |---|---|
-| **Pass** | Observed true this round. |
-| **Fail** | Exercised and false. This is the round's work list. |
-| **Blocked** | Could not be exercised, with the reason. |
+| **Pass** | The checker observed it true in the browser this round. |
+| **Fail** | The checker exercised it and it was false. This is your work list. |
+| **Blocked** | The checker could not exercise it, with the reason. |
 
 Blocked is not failure and does not stall the loop. The pilot's *sold-out variant disables the button* had no sold-out variant on the store to test against, and no number of rounds produces one. Record why and move on.
 
-On a return round from `/qa`, every unresolved item in the most recent QA round joins the criteria as loop input, and it is gated on exactly the same terms as a criterion: passing means you observed it fixed, blocked means you say why it could not be exercised, and neither is the same as deciding not to fix it. Ben's `from Ben · refines criterion 3` item does not clear itself by being mentioned in the round — it clears by being observed true or provably blocked, same as a criterion that started the round failing.
+On a return round from `/qa`, every unresolved item in the most recent QA round joins the criteria as checker input, and it is gated on exactly the same terms as a criterion: passing means the checker observed it fixed, blocked means it says why it could not be exercised, and neither is the same as deciding not to fix it. Ben's `from Ben · refines criterion 3` item does not clear itself by being mentioned in the round — it clears by being observed true or provably blocked, same as a criterion that started the round failing.
 
-### Use a real rendering browser
+### Browser rules — yours and the checker's
+
+#### Use a real rendering browser
 
 Use Playwright. Do **not** verify scroll, observer, or animation behaviour in an embedded preview pane — panes commonly stop producing frames when nothing is capturing them, and `IntersectionObserver` delivery is tied to frame production. A pane that has stopped painting reports a freshly-constructed observer as never firing. Nothing errors. The results simply lie, and they lie in both directions: on the pilot the same code got a false pass and then a false fail.
 
 Embedded panes also clamp the viewport. If you ask for 320px and get 362px, you have not tested 320px.
 
-### Treat the browser as expensive
+#### Treat the browser as expensive
 
 Automated request volume against a live storefront trips bot protection, not merely rate limiting. On the pilot this returned `429` with `cf-mitigated: challenge` and did not clear across four minutes of polling. **Working around bot protection is never an option**, so a tripped challenge ends verification for the session.
 
@@ -92,13 +119,13 @@ Therefore:
 - Never poll in a loop to wait for a service. Wait once, generously.
 - Never re-load a page to check one more thing you could have checked in the same pass.
 
-### Capture the request, not the appearance
+#### Capture the request, not the appearance
 
 For anything transactional — a cart add, a form post, a checkout step — wrap `XMLHttpRequest.prototype.send` and `window.fetch` and record the payload, then let it through. This proves what the server actually received rather than what the page appeared to do, and it costs one page load instead of a dozen clicks.
 
 Then read the resulting state once, from the platform's own JSON endpoint, and compare against what the UI claimed.
 
-### Suspect anything a third-party app owns
+#### Suspect anything a third-party app owns
 
 Third-party widgets are the most common source of bugs that survive review:
 
@@ -106,33 +133,34 @@ Third-party widgets are the most common source of bugs that survive review:
 - **Their updates are asynchronous.** A single recompute after an interaction races them and fails intermittently. Re-check over a bounded window instead of guessing one delay. Intermittent display bugs on a price reach production.
 - **They render their own values.** Mirroring the theme's element can be faithful and still wrong, because the app never updated it.
 
-### Look at the page, not just the assertions
+#### Look at the page, not just the assertions
 
 Criteria can pass while the screen is wrong. On the pilot the cart was always correct and the bar still displayed a price the shopper was not about to pay. Take a screenshot at a real viewport width and read it. Open the drawers, modals, and overlays the feature might collide with, and use `elementFromPoint` to find out what is actually on top — a `z-index` comparison is meaningless across stacking contexts, and raising the number looks like a fix while changing nothing.
 
-### Record honestly
-
-Note which criteria you exercised and which you did not. You are not the one who ticks them — see below.
-
 ### Exit conditions
 
-- Every criterion and every unresolved QA item passes or is blocked.
-- Three rounds have run. Whatever is not green is reported as it stands.
-- Bot protection trips, or the environment will not stand up. See `### Treat the browser as expensive` above.
-- A fix would require changing something above the divider. That is a conversation, not a decision the loop gets to make.
+**The loop passes** when a checker round returns every criterion and every unresolved QA item as pass or blocked. That is the only clean exit, and it is the one you are aiming for.
 
-The cap exists because a loop with no cap thrashes hardest on the bug it cannot solve, and every round costs a page load against a storefront that is already counting them.
+**There is no round cap.** Run as many rounds as the work takes. A loop that quits at three on a bug it was one round from solving is worse than one that keeps going, and a fresh checker each round is a real signal to run against rather than your own conviction.
+
+The loop stops without passing only for:
+
+- **No progress.** Two consecutive rounds where the same item fails and the checker's observation of it is unchanged. Your fix moved nothing. Stop and say so — repeating a fix that already failed is thrash, not a round. This is a stall condition, not a round budget: items that improve each round keep going, however many rounds that takes.
+- **Bot protection trips, or the environment will not stand up.** See `#### Treat the browser as expensive` above. Ends verification for the session.
+- **A fix would require changing something above the divider.** That is a conversation, not a decision the loop gets to make.
+
+In all three, whatever is not green is reported exactly as it stands.
 
 ## 5. Append the Build round to the ticket
 
-One Build round is appended per session, not one per iteration. Iterations are working state; the ticket is a record.
+One Build round is appended per session, not one per check round. Check rounds are working state; the ticket is a record. Say how many ran and how the last one landed.
 
 Add a section at the end of the ticket. Never edit above the divider.
 
 ```markdown
 ## Build — round 1 · 2026-08-09
 
-Three verify rounds. Moved the bar out of `main-product` into a root-level
+Five check rounds, cleared on the fifth. Moved the bar out of `main-product` into a root-level
 render so it shares a stacking context with the drawer, then added the
 no-variant price suppression after round 2 showed it flashing $0.00.
 
@@ -179,7 +207,7 @@ Do not write a summary onto the task. That is written once, at sign-off, from th
 
 ## 9. Hand off
 
-Clean or blocked-only — every criterion and every unresolved QA item passes or is blocked — stop with the task at `status: review`. Print the handoff:
+Clean or blocked-only — a checker round returned every criterion and every unresolved QA item as pass or blocked — stop with the task at `status: review`. The verdict that closes this out is the checker's, not yours. Print the handoff:
 
 ```
 /clear
@@ -188,9 +216,9 @@ Clean or blocked-only — every criterion and every unresolved QA item passes or
 /qa <task>
 ```
 
-Cap hit with failures still standing — the task **stays at `status: in-progress`**. Say what is still failing and ask. That state is not ready for a human to sign anything off, and moving it to `review` would misrepresent it.
+Loop stopped without passing — stalled, bot-blocked, or held on an above-the-divider question — the task **stays at `status: in-progress`**. Say what is still failing, quote the checker's last observation of it, and ask. That state is not ready for a human to sign anything off, and moving it to `review` would misrepresent it.
 
-The next move on a held ticket is another `/build` session, not `/qa` — nothing here is ready for review. The 3-round cap is per session, not cumulative: a fresh session's loop starts at round 1 with a clean budget. Print the handoff:
+The next move on a held ticket is another `/build` session, not `/qa` — nothing here is ready for review. A fresh session gets a fresh environment and a checker with no memory of the stall, which is often enough to break it. Print the handoff:
 
 ```
 /clear
@@ -211,3 +239,4 @@ The task is a billing record. The ticket is the evidence behind it.
 - **Anything found after the human has reviewed** is disclosed and re-offered, never folded in silently. An approval covers the state the reviewer saw.
 - **Never let the foundation files drift from what you just built.**
 - **Never hand off at `review` with a criterion or an unresolved QA item still failing.** Blocked is a handoff. Failing is not — and an item merely answered without being fixed or blocked is still failing.
+- **Never close the loop on your own verdict.** Every exit to `review` is a checker round that came back clean. If you changed code after the last clean round — even a one-liner, even a comment — run another round.
