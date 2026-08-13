@@ -16,7 +16,7 @@ This exists because the usual build loop assumes a test runner and a type checke
 |---|---|---|
 | Where | vault `Tasks/` | this repo, `.cortex/<task>/` |
 | Is | the billing record | your brief |
-| You write | one Work Log row, proposed hours, `status` | one appended Build round |
+| You write | `status`, and nothing else | one appended Build round |
 
 You build from the ticket. You bill against the task. Never re-derive scope from the task — it deliberately does not carry criteria.
 
@@ -26,7 +26,7 @@ You build from the ticket. You bill against the task. Never re-derive scope from
 
 **Resolving the vault project.** Prefer what Cortex boot already resolved — the `<cortex-session>` block in context names the vault path and the active project, and at L3 it is fully resolved before the first message. With no block, call `find_project_by_cwd` from `cortex-vault`. Read `docs/agents/issue-tracker.md` only when neither resolves. From a resolved project both paths follow by convention: tasks are `<project>/Tasks/`, tickets are `<repo root>/.cortex/`. If a binding file names a different project than boot resolved, stop and say both — silently preferring either is how a stale binding gets worse instead of better. If nothing resolves, stop and say this repo has not been registered with Cortex; `/cortex-register-repo` is the move that binds it.
 
-**With no argument:** read the resolved `Tasks/` folder, list every task at `todo` or `in-progress` with its status and estimate, and ask which. Do not pick one silently.
+**With no argument:** read the resolved `Tasks/` folder, list every task at `todo` or `in-progress` with its status, and ask which. Do not pick one silently.
 
 **With a task that has several tickets:** take the lowest-numbered `NN-<slug>.md` ticket that is not yet accepted, and say which one you took before doing anything else. `/build homepage 02` overrides.
 
@@ -197,13 +197,13 @@ Commit this build's work, then set the `commit:` stamp on each foundation file y
 
 Skip the stamp if `.cortex/foundation/` is absent.
 
-## 8. Record the work on the task
+## 8. Leave the task's record alone
 
-Add one Work Log row to the **vault task** for this session. Bump the task's frontmatter `hours` to match the Work Log total.
+`status` is the only field on the **vault task** this move touches. The record of what happened this session is the Build round on the ticket, and that is where it stays.
 
-**Propose hours; never finalise them.** Elapsed session time is not billable time. Research you did quickly and dead ends you created for yourself are not the client's to pay for. State the number you are writing and invite correction — on the pilot the agent logged 3 hours for work the human priced at 2.
+**Do not log time, and do not estimate it.** Elapsed session time is not billable time — research you did quickly and dead ends you created for yourself are not the client's to pay for, and an agent has no way to tell those apart from the inside. On the pilot the agent logged 3 hours for work the human priced at 2. `hours` and the estimate fields are the human's, filled in Obsidian.
 
-Do not write a summary onto the task. That is written once, at sign-off, from the whole ticket.
+Do not write a summary onto the task either. That is written once, at sign-off, from the whole ticket.
 
 ## 9. Hand off
 
@@ -235,7 +235,7 @@ The task is a billing record. The ticket is the evidence behind it.
 - **Never move a task to `done`.** `review` is as far as this skill goes. Only the human accepts.
 - **Never edit above the ticket's divider.** Intent, Decisions, and Criteria are frozen. Append.
 - **Never tick a criterion.** No move ticks the frozen Criteria section — its checkboxes stay unticked by design, above the divider, forever. The record of what passed lives in the Build round below the divider, not in ticked boxes above it.
-- **Never invent or adjust `rate`, `billed`, or `invoice`.**
+- **Never invent or adjust `rate`, `billed`, `invoice`, `hours`, or either estimate field.** Those are the human's, set in Obsidian.
 - **Anything found after the human has reviewed** is disclosed and re-offered, never folded in silently. An approval covers the state the reviewer saw.
 - **Never let the foundation files drift from what you just built.**
 - **Never hand off at `review` with a criterion or an unresolved QA item still failing.** Blocked is a handoff. Failing is not — and an item merely answered without being fixed or blocked is still failing.

@@ -14,7 +14,7 @@ Shopify Liquid and WordPress PHP theme work, where there is no test runner and n
 |---|---|---|
 | Lives in | vault `Tasks/`, or Monday | repo `.cortex/<task>/` |
 | Is | the billing unit | one build session |
-| Carries | hours, rate, billing state, a short client-readable summary | intent, decisions, criteria, and every QA and build round |
+| Carries | hours, rate, billing state — all yours — and a short client-readable summary | intent, decisions, criteria, and every QA and build round |
 | Edited | by you, at sign-off | append-only after it is written |
 
 One task has one or more tickets. Usually one. A homepage is one invoice and five sessions; an audit is one request and nine invoices. Tasks never nest — grouping is a `parent:` label in frontmatter that groups a view and nothing more.
@@ -82,7 +82,7 @@ Its frontmatter feeds an invoice roll-up. That drives the guardrails:
 - Never delete a task or a ticket — cancelled work is closed in place with the reason recorded
 - Never move a task to `done` — `review` is as far as an agent goes
 - Never tick a criterion — an agent that ticks its own work ticks everything
-- Never invent hours; propose them and invite correction
+- Never write hours or an estimate — no move logs time, reconciles it, or guesses at it; the fields live in the task note and you fill them
 - Never rewrite Intent, Decisions, or Criteria on a ticket in flight — append instead
 
 ## Why the browser
