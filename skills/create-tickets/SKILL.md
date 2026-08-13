@@ -99,7 +99,7 @@ The counter-pressure matters just as much, or this becomes a machine for deferri
 
 If what you have described is more than one build session's worth of work, say so and propose a split. This is part of the job, not something to wait to be asked for.
 
-This move may write one ticket or several. A homepage with five sections is one task and five tickets. Each ticket is independently buildable and independently verifiable, and each is researched on its own terms — five tickets written cheaply from one pass of research is the failure this move exists to prevent. The hours still land on the one task.
+This move may write one ticket or several. A homepage with five sections is one task and five tickets. Each ticket is independently buildable and independently verifiable, and each is researched on its own terms — five tickets written cheaply from one pass of research is the failure this move exists to prevent. The billing still lands on the one task.
 
 Where the split is not obvious, propose it with a one-line description of each ticket and the order, and confirm before writing anything. The human approves it. Then write them as `01-<slug>.md`, `02-<slug>.md`, and so on in `.cortex/<task>/`.
 
@@ -158,15 +158,7 @@ Criteria are the definition of done, and they are also what the audit measures t
 
 Then read them back and ask: *if every one of these were ticked, could the screen still be wrong?* On the pilot the answer was yes — every criterion was satisfiable in a state where the bar showed $22.00 and the cart charged $18.70. If the answer is yes, there is a criterion missing.
 
-## 7. Record the scoping time
-
-Add a Work Log row to the **vault task** for this session, marked as scoping.
-
-Whether scoping is billable to the client or overhead is unsettled — flag the row rather than deciding it. State the time, say it is scoping, and let the human place it.
-
-**Propose the number; never finalise it.** Research you did quickly is not the client's to pay for.
-
-## 8. The completeness gate
+## 7. The completeness gate
 
 **Do not print the handoff until every question you asked and every finding you surfaced is in the ticket.**
 

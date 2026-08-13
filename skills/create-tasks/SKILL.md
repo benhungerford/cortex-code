@@ -22,9 +22,9 @@ The same applies to `Not yet specified`. A map is only finished when that sectio
 
 Not a ticket, and not a substitute for one. A task is the billing unit — it names the client and the price and it stops there. A ticket is a build session's brief, written later by `/create-tickets`, and it carries the intent, the decisions, and the criteria a cold `/build` needs. This move produces the first; it never touches the second, and a proposed task table with build steps or acceptance criteria in it has drifted into writing tickets by another name.
 
-It lives in the vault, or arrives from Monday and is mirrored there. It carries hours, rate, billing state, and a short client-readable summary of what shipped — what you would show the client, not what you'd hand a build session. Tasks never nest. `parent:` is a grouping label and nothing more; it groups a view, and no move ever resolves anything through it.
+It lives in the vault, or arrives from Monday and is mirrored there. It carries the human's own hours, rate, and billing state, and a short client-readable summary of what shipped — what you would show the client, not what you'd hand a build session. Tasks never nest. `parent:` is a grouping label and nothing more; it groups a view, and no move ever resolves anything through it.
 
-The task and ticket model covers this with two shapes, and a proposed set should recognize which one it's drawing. A site audit is nine independent tasks that share `parent: "Q3 audit"`, each with its own hours and its own ticket. A homepage rebuild is the opposite: one task, because the client is billed for one deliverable, with five tickets underneath it doing the five sections of work. Getting this wrong in either direction either fragments one deliverable into a client-facing invoice with nine line items, or buries nine independent pieces of work inside one task nobody can bill piecemeal.
+The task and ticket model covers this with two shapes, and a proposed set should recognize which one it's drawing. A site audit is nine independent tasks that share `parent: "Q3 audit"`, each billed on its own and each with its own ticket. A homepage rebuild is the opposite: one task, because the client is billed for one deliverable, with five tickets underneath it doing the five sections of work. Getting this wrong in either direction either fragments one deliverable into a client-facing invoice with nine line items, or buries nine independent pieces of work inside one task nobody can bill piecemeal.
 
 ## Name the task for what it is
 
@@ -42,20 +42,20 @@ Keep the slug short. Slug the title, not the scope line — three or four words.
 
 Before anything is written, show the whole proposed set as one table:
 
-| Title | Slug | Scope line | Proposed hours | `parent:` | Build order |
-|---|---|---|---|---|---|
+| Title | Slug | Scope line | `parent:` | Build order |
+|---|---|---|---|---|
 
 Show the whole set at once, not one row at a time. The shape of the split — how many tasks, what shares a `parent:`, what stands alone — is the thing being approved, and it can only be judged by seeing it whole. A table shown one row at a time hides exactly the decision that matters: whether this should have been three tasks instead of one, or one instead of three.
 
-**Hours are proposed, not asserted, and correction is invited outright.** Say so when you show the table. Estimating badly here is a known failure mode already logged elsewhere in this plugin: on the pilot, the build move logged 3 hours for work the human had priced at 2. State what each estimate assumes — a comparable task, a rough sizing, whatever informed the number — and let the human place the real figure. An hours column with no stated assumption behind it is not a proposal, it's a guess wearing a proposal's clothes.
+**No hours, and no estimate.** Sizing work is the human's, and an agent that guesses at it produces a number that reads like a figure when it is a fabrication — on the pilot the build move logged 3 hours for work the human had priced at 2. The table describes scope; the time it takes is set in Obsidian by the person who will do it.
 
 ## Write only on approval
 
-Nothing is written until the human approves the set as shown. If the human wants a change — split a row, fold two together, adjust an hour, rename a `parent:` — make the change in the table and show the table again. Do not write the tasks and then patch them to match what was actually asked for. The approval is of the table the human saw, and a table that changed after approval was never actually approved.
+Nothing is written until the human approves the set as shown. If the human wants a change — split a row, fold two together, reword a scope line, rename a `parent:` — make the change in the table and show the table again. Do not write the tasks and then patch them to match what was actually asked for. The approval is of the table the human saw, and a table that changed after approval was never actually approved.
 
 ## The task file
 
-Each approved row becomes one task file, with this frontmatter, verbatim — the task and ticket model's block minus `rate:` and plus `cortex:`, `rate` being the human's to set when they price the task:
+Each approved row becomes one task file, with this frontmatter, verbatim — the task and ticket model's block plus `cortex:`. `rate`, `estimate_low`, `estimate_high`, and `hours` are the human's to set when they price and size the task:
 
 ```yaml
 ---
@@ -65,9 +65,9 @@ client: Acme Coffee
 project: Shopify Website Build
 parent: "Q3 audit"
 status: todo
-estimate_low: 1
-estimate_high: 2
-hours: 0
+estimate_low: ""
+estimate_high: ""
+hours: ""
 billed: false
 invoice: ""
 cortex: .cortex/why-regenerative/
@@ -76,7 +76,7 @@ cortex: .cortex/why-regenerative/
 
 The note's filename carries the title — `Why Regenerative.md`. `task:` carries the slug, because it is a join key rather than a label, and every capture file underneath this task repeats it to point back here.
 
-`billed` and `invoice` are written at their defaults because a new task is, by definition, unbilled. `rate` is deliberately absent — it's a real per-client number this move has no basis to know, and the human sets it.
+`billed` and `invoice` are written at their defaults because a new task is, by definition, unbilled. `rate`, `estimate_low`, `estimate_high`, and `hours` are written empty on purpose — the price and the time are real numbers this move has no basis to know, and filling them with a plausible-looking guess is worse than leaving them blank for the human. The fields exist in the note so Obsidian can hold them; nothing in this plugin ever writes them.
 
 `cortex:` is the pointer to the capture folder that `/create-tickets` will write into. Write it now, before that folder exists — the pointer is the contract, and the folder catches up to it. It is also the only place the slug is authoritative: downstream moves read this key rather than recomputing it, which is what keeps a retitled task from losing its capture folder.
 
@@ -100,7 +100,7 @@ This keeps Obsidian and Monday a configuration difference, not a code path this 
 ## Guardrails
 
 - **Never write a task without explicit approval of the set.** Approval of one row is not approval of the table.
-- **Never invent hours.** Propose them, state the assumption behind each one, and invite correction.
+- **Never write hours or an estimate.** Leave `estimate_low`, `estimate_high`, and `hours` empty, and do not propose numbers in conversation either. Sizing is the human's.
 - **Never invent a `rate`.** Set `billed` and `invoice` to nothing but their defaults — `false` and `""`. Those belong to billing, not to this move.
 - **Never number a task.** It is named for what it is, and the slug of that name is the key.
 - **Never write a task whose slug collides with an existing one.** Say so and ask for a distinguishing name; never append a suffix yourself.

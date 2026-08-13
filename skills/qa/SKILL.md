@@ -38,7 +38,7 @@ Read Intent, Decisions, and Criteria above the divider, then every round below i
 
 ## 2. Rebuild the environment
 
-Stand up whatever the ticket's "How this gets verified" section specifies — this feeds the fifth collection source only, what you find by looking at the screen. If you cannot — auth is broken, a service is down, bot protection is tripped — do not stop the round. Collect the four sources that need no browser (Ben's edits, Pastel comments, client feedback, criteria `/build` reported as blocked) as normal, record in the round that the screen was not examined and why, and still end at the explicit ask in section 7. What you must never do is review the diff instead and call it a look at the screen — a diff review is a different, weaker activity, and recording it as screen-truth corrupts the record.
+Stand up whatever the ticket's "How this gets verified" section specifies — this feeds the fifth collection source only, what you find by looking at the screen. If you cannot — auth is broken, a service is down, bot protection is tripped — do not stop the round. Collect the four sources that need no browser (Ben's edits, Pastel comments, client feedback, criteria `/build` reported as blocked) as normal, record in the round that the screen was not examined and why, and still end at the explicit ask in section 6. What you must never do is review the diff instead and call it a look at the screen — a diff review is a different, weaker activity, and recording it as screen-truth corrupts the record.
 
 Where the environment does stand up, the browser rules from `build` apply unchanged: use a real rendering browser rather than an embedded pane, batch every assertion for a page state into one evaluation, capture the request rather than the appearance for anything transactional, and suspect anything a third-party app owns.
 
@@ -130,22 +130,13 @@ Each entry carries the case that produced it, because a question with no evidenc
 
 The timing differs because the two ledgers answer to different clocks. The foundation file is about the very next pass on this repo, so it cannot wait. The ledger is about the next project, so nothing needs it sooner — and a pattern written mid-project is written from half the picture; round 2 routinely reframes what round 1 looked like.
 
-## 6. Reconcile the hours
-
-Total the Work Log on the **vault task**. Check it against the task's frontmatter `hours`.
-
-**Propose the number; never finalise it.** Elapsed session time is not billable time. Research done quickly, and dead ends the agent created for itself, are not the client's to pay for. On the pilot the agent logged 3 hours for work the human priced at 2.
-
-State the total and the estimate range together, so an overrun is visible before it reaches an invoice rather than after.
-
-## 7. Send back, or accept
+## 6. Send back, or accept
 
 Present, in this order:
 
 1. **What was collected**, with the origin of each
 2. **Anything still blocked**, with why
-3. **Hours** — proposed total against estimate
-4. **The explicit ask:** send back to `/build`, or accept as it stands?
+3. **The explicit ask:** send back to `/build`, or accept as it stands?
 
 Acceptance is the empty case. When a round collects nothing, the only thing left to ask is whether to accept. A round carrying only a `blocked in build` item that no environment can reach is not the empty case — it collected something, it just cannot resolve it. Present it as it stands and let the human decide whether to accept with it open or send back anyway.
 
@@ -160,7 +151,7 @@ Acceptance is the empty case. When a round collects nothing, the only thing left
 
 Failures found in QA stay in the ticket permanently, not just until they are fixed. They are the most useful part of it a year later, and deleting a resolved finding destroys the audit signal it carries.
 
-## 8. On acceptance
+## 7. On acceptance
 
 Only when the human accepts, and only on the **task**:
 
@@ -168,7 +159,7 @@ Only when the human accepts, and only on the **task**:
 - If tickets remain on this task, leave `status: in-progress` and print the handoff to `/build` for the next one.
 - If that was the last ticket, `status: done`.
 - Leave `billed: false` — invoicing is a separate act.
-- Update the `Tasks/_MOC.md` row: status and hours.
+- Update the `Tasks/_MOC.md` row: status only. Leave any hours or estimate column as it stands — those are the human's.
 - Log the closure.
 - Write the cross-project ledger entries from section 5 now.
 
@@ -181,6 +172,6 @@ If the human accepts while something is still open, say so plainly and let them 
 - **Never edit above the ticket's divider.** If QA proves a decision wrong, that is an appended finding, not an edit.
 - **Never move a task to `done` without explicit acceptance**, and never while a ticket on it is unfinished.
 - **Never delete a task, a ticket, or a past finding.** Cancelled work closes in place with the reason recorded.
-- **Never invent or adjust `rate`, `billed`, or `invoice`.**
+- **Never invent or adjust `rate`, `billed`, `invoice`, `hours`, or either estimate field.** Those are the human's, set in Obsidian — this move neither logs time nor reconciles it.
 - **Never re-walk the criteria.** `/build` owns them. Anything you find is a new item with its own origin, not a re-test.
 - **Anything found after the human has reviewed is disclosed and re-offered**, never folded in silently. An approval covers the state the reviewer saw.
