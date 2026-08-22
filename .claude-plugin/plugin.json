@@ -1,7 +1,7 @@
 {
   "name": "cortex-code",
   "description": "A client build workflow from a loose idea to a signed-off build. Charts a map of open questions, proposes the billable tasks, assembles the build tickets, implements against their criteria, and verifies in a real browser \u2014 for themes and sites where a test runner does not exist.",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "author": {
     "name": "Ben Hungerford"
   },

@@ -1,6 +1,6 @@
 ---
 name: build
-description: Implement a repo ticket, then loop against a fresh checker agent that verifies it in a real browser until every criterion passes. For theme work with no test runner. Usage:/build why-regenerative
+description: Implement a repo ticket, then loop against a fresh checker agent that verifies it in a real browser until every criterion passes. Runs one ticket, or every ticket on a task in sequence, or fanned out across isolated worktrees. For theme work with no test runner. Usage:/build why-regenerative
 disable-model-invocation: true
 ---
 
@@ -28,7 +28,63 @@ You build from the ticket. You bill against the task. Never re-derive scope from
 
 **With no argument:** read the resolved `Tasks/` folder, list every task at `todo` or `in-progress` with its status, and ask which. Do not pick one silently.
 
-**With a task that has several tickets:** take the lowest-numbered `NN-<slug>.md` ticket that is not yet accepted, and say which one you took before doing anything else. `/build homepage 02` overrides.
+**With a task that has exactly one unaccepted ticket:** take it, say which one you took, and start. Nothing to ask.
+
+**With a task that has several unaccepted tickets: ask which mode.** Do not pick one silently — taking the lowest-numbered ticket by default is how a five-ticket task turns into five typed commands nobody asked for, and fanning out by default is how bot protection trips. List the unaccepted tickets, then ask:
+
+| Choice | Runs |
+|---|---|
+| **One at a time** | The lowest-numbered unaccepted ticket, then stop and hand off — the original behaviour |
+| **All, sequentially** | Every unaccepted ticket, in order, without pausing |
+| **All, in parallel** | Every unaccepted ticket at once, one isolated worktree each |
+
+Recommend **all, sequentially** unless the tickets are provably disjoint and the browser cost has been accepted — see **Run modes** below for why parallel is not the default.
+
+**Explicit forms skip the ask entirely:**
+
+| Form | Runs |
+|---|---|
+| `/build <task> 02` | That ticket only |
+| `/build <task> one` | One at a time |
+| `/build <task> all` | Every unaccepted ticket, sequentially |
+| `/build <task> all --parallel` | Every unaccepted ticket, fanned out |
+
+Sections 1–8 describe a single ticket's pass; the mode decides how many of those happen and in what order.
+
+## Run modes
+
+`/build <task>` on a single-ticket task is unchanged. On a multi-ticket task it asks, because all three answers are reasonable and which one is right depends on things the skill cannot see — whether the tickets collide, whether the storefront can take four checkers, and whether Ben wants to watch the first one land before committing the rest.
+
+### Sequential — `/build <task> all`
+
+Read `.cortex/<task>/`, list every `NN-<slug>.md` ticket that is not yet accepted, and say the list before starting. Then run sections 1–8 against each one in number order, and **keep going without asking**. Between tickets, print one line: the ticket, how many check rounds it took, and anything blocked.
+
+The task stays at `status: in-progress` for the whole run. It moves to `review` only when the last ticket in the list has cleared.
+
+**The run halts — the whole run, not just the current ticket — on any of the three stop conditions in Exit conditions:**
+
+- **A stall.** Say which ticket stalled and on what. Do not skip past it to the next ticket; a stalled ticket usually means the ticket is wrong, and building three more on top of that assumption compounds it.
+- **Bot protection tripping, or the environment failing to stand up.** This one is session-wide, not ticket-wide — no later ticket in the run can be verified either. End the run, say which ticket it tripped on, and name every ticket that was never started.
+- **A fix that would need something above a divider.** That is a conversation. Halt.
+
+On any halt, tickets already completed keep their Build rounds and their commits. Report what shipped, what held, and what was never reached, in that order.
+
+### Parallel — `/build <task> all --parallel`
+
+One `Agent` per ticket, each with `isolation: "worktree"`, all spawned in a single message. **This is not the default and it is not free.**
+
+**Run the overlap check first.** Read the files each unaccepted ticket names. If two tickets name the same file, they cannot run in parallel — say which tickets and which file, and offer sequential for the whole set. Do not fan out a partial set and run the rest sequentially; a half-parallel run makes the merge order ambiguous.
+
+**Say the browser cost out loud before fanning out, and get a yes.** Every agent runs its own checker loop, and every checker loop hits the same live storefront. The `#### Treat the browser as expensive` rules exist because bot protection trips and does not clear — running four checkers at once is the most reliable way to trip it, and when it trips it takes the whole run with it. If the tickets can only be verified against one shared live environment, sequential is the correct mode and you should say so rather than asking.
+
+Each agent gets: the repo path, its ticket path, sections 1–8 of this file as its instructions, and the browser rules verbatim. Each agent appends its own Build round to its own ticket file and commits inside its own worktree.
+
+**Two things agents must not do, stated in their prompt:**
+
+- **Do not write `.cortex/foundation/`.** Four agents appending to `concerns.md` conflict on merge, and the conflict is silent because each one's edit is individually correct. Agents *return* their foundation findings; the orchestrator writes them once, after the merge.
+- **Do not stamp `commit:`.** The SHA that matters is the one after the merge, not the one inside a worktree.
+
+Afterwards, the orchestrator: merges each worktree branch in ticket number order, writes the collected foundation updates as one edit, commits, stamps `commit:` on every foundation file touched, and reports per ticket. Any agent that came back stalled or blocked holds the task at `in-progress` exactly as it would in sequential.
 
 ## 1. Read the ticket. It is the contract.
 
@@ -45,6 +101,8 @@ The ticket has a frozen half and an appended half, split by a `---` divider.
 **Criteria are the definition of done.** Read them before writing anything, because they usually encode a hazard the ticket found. On the pilot, three criteria existed only because research discovered a subscription app inside the product form.
 
 **Below the divider are the rounds.** If QA has run, its findings are there with an origin tag on each. This is the actual work list for a return visit — the specific thing that broke, not the whole ticket again. Read every unresolved item from the most recent QA round before you touch anything.
+
+**Then check `.cortex/qa/` for an open batch QA doc.** `/qa` run against a CSV, a doc, or a pasted list of client edits writes its findings there rather than into each ticket, and each item in it names the ticket it was attributed to. Any open batch doc with an unticked item attributed to *this* ticket is part of your work list, on exactly the same terms as an item in a QA round below the divider — it clears by being observed fixed or provably blocked, not by being discussed. Read the batch doc's items for this ticket before you touch anything, and pass them to the checker verbatim alongside the criteria.
 
 Set the **task** to `status: in-progress` if it is not already.
 
@@ -84,6 +142,7 @@ The checker starts with no memory of your reasoning, and that is the point. Give
 - The repo path, the ticket path, and the URL(s) to verify against.
 - Every criterion, **verbatim** from above the divider.
 - Every unresolved item from the most recent QA round, verbatim.
+- Every unticked item attributed to this ticket in an open `.cortex/qa/` batch doc, verbatim.
 - What changed this round — files touched, one line each. What you changed, not why it should work.
 - The browser rules below. They bind the checker as much as they bind you.
 
@@ -207,6 +266,8 @@ Do not write a summary onto the task either. That is written once, at sign-off, 
 
 ## 9. Hand off
 
+**On a whole-task run (`all`), sections 1–8 repeat per ticket and this section runs once, at the end of the run.** Do not print a handoff between tickets — that is what the one-line per-ticket report is for. On a halt, hand off as held, below.
+
 Clean or blocked-only — a checker round returned every criterion and every unresolved QA item as pass or blocked — stop with the task at `status: review`. The verdict that closes this out is the checker's, not yours. Print the handoff:
 
 ```
@@ -239,4 +300,8 @@ The task is a billing record. The ticket is the evidence behind it.
 - **Anything found after the human has reviewed** is disclosed and re-offered, never folded in silently. An approval covers the state the reviewer saw.
 - **Never let the foundation files drift from what you just built.**
 - **Never hand off at `review` with a criterion or an unresolved QA item still failing.** Blocked is a handoff. Failing is not — and an item merely answered without being fixed or blocked is still failing.
+- **Never pick a run mode silently on a multi-ticket task.** Ask, unless the command named one.
+- **Never skip a ticket in a whole-task run.** A ticket that stalls halts the run. Moving on to the next one buries the question the stall was asking.
+- **Never fan out in parallel across tickets that touch the same file**, and never fan out without saying the bot-protection cost first.
+- **Never let a parallel agent write `.cortex/foundation/` or stamp `commit:`.** Both happen once, in the orchestrator, after the merge.
 - **Never close the loop on your own verdict.** Every exit to `review` is a checker round that came back clean. If you changed code after the last clean round — even a one-liner, even a comment — run another round.

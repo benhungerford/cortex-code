@@ -29,8 +29,8 @@ One task has one or more tickets. Usually one. A homepage is one invoice and fiv
   └ /prototype
 /create-tasks              proposed task set → you approve → written
 /create-tickets            task + capture + foundation → one or more tickets
-/build
-/qa
+/build                     asks: one at a time, all sequentially, or all in parallel
+/qa                        one task, or a CSV/doc of edits spanning many tickets
 ```
 
 The order above is a default, not a gate. Tasks may exist before ideation runs, and often will — a client sends a list, and you ideate each item. Ideation may equally run first and produce the tasks. `/create-tickets` reads whatever exists and does not care which came first. Foundation and ideation are both skippable; a thirty-minute CSS fix goes straight to `/create-tickets`, and when it is unclear the move asks.
