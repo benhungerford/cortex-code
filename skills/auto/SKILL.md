@@ -16,7 +16,21 @@ You are the **main agent**. You hold the brief, the status, and file paths — n
 
 ## Inputs
 
-`/auto <brief>` — the brief's file name in `<vault>/_Briefs/`, matched by prefix. With no argument, list every brief at `status: ready` and take the oldest by `created`; say which you took.
+`/auto <brief>` — the brief's file name in `<vault>/_Briefs/`, matched by prefix. With no argument, list every brief at `status: ready` and take the oldest by `created`; say which you took. A hand run is **slot 0**.
+
+`/auto --pickup <slot>` — the scheduled form (slots 1–3, one scheduled task each). Run, from this skill's folder:
+
+```bash
+python3 claim.py --vault "<vault>" --slot <slot>
+```
+
+It takes the oldest ready brief whose site has no run going, flips it to `running` with `run_started` and `run_slot`, and prints JSON. It holds a lock while it does this, so two slots firing together never take the same brief.
+
+- `"claimed": null` → nothing to do. Say the `reason` in one line and stop. **No notification**; an empty check every 15 minutes is not news.
+- `"stale"` lists briefs still `running` more than 8 hours after they started. A run that long has probably died and is holding its site. Name them in your one line. Don't touch them; Ben decides.
+- A claimed brief → carry on from Intake with that brief.
+
+Limits live in `claim.py`'s flags: 3 runs at once in total, **1 per site** (`--per-site`). More than one per site waits on separate preview themes per brief and the bot-check question (OQ-04). The worktrees below already allow it.
 
 The vault path comes from the `<cortex-session>` block, or `get_boot_context` from `cortex-vault` where there is no block.
 
@@ -42,8 +56,8 @@ These sit on top of every guardrail in every move this skill runs. Nothing here 
 
 Validate before anything is created. Any failure here **blocks** the run: set `status: blocked`, write the reason under the brief's `## Run log`, notify (section 7), and stop. Do not start "the parts that work".
 
-1. **Status is `ready`.** Not `draft`, not `running` (another run has it).
-2. **Project resolves.** `project:` is a full vault path to a TBL project that exists and has a Project Context hub. Look it up in `<vault>/.claude/cortex/registry.json` and confirm it has at least one entry in `repo_paths`. No repo, no run.
+1. **Status is `ready`.** Not `draft`, not `running` (another run has it). The one exception: a pickup's own claim, which is `running` with this run's `run_slot`.
+2. **Project resolves.** `project:` is a full vault path to a TBL project that exists and has a Project Context hub. Look it up in `<vault>/.claude/cortex/registry.json` and confirm it has at least one entry in `repo_paths`, and that the repo is a git repo (`git rev-parse` succeeds). No repo, no run. Sites the registry lists as `repo_kind: worktree` are plain folders synced over SFTP; they block with "no git repo — the SFTP baseline isn't set up" until it is.
 3. **Required sections are filled.** `## What` and `## Designs` contain something other than the template's placeholder text.
 4. **The site is unlaunched.** From the brief's `## Where` URL, or the project hub's staging URL:
    - **Shopify** — the storefront redirects to `/password`. One request, no retries.
@@ -53,8 +67,15 @@ Validate before anything is created. Any failure here **blocks** the run: set `s
 
 Then:
 
-- Set `status: running` and `run_started:` (`YYYY-MM-DDTHH:mm`, local) on the brief.
-- Create the run branch: `auto/<brief-slug>` from the repo's current branch. Say which branch it was cut from in the run log.
+- Set `status: running` and `run_started:` (`YYYY-MM-DDTHH:mm`, local) on the brief, unless the pickup's claim already did.
+- Create the run's own copy of the code, on its own branch, cut from the repo's current branch:
+
+  ```bash
+  git -C "<repo>" worktree add ~/.cortex-auto/worktrees/<registry id>/<brief-slug> -b auto/<brief-slug>
+  ```
+
+  **From here on, "the repo" means this worktree.** Give its path to every helper as the repo path. The main checkout is never written by a run, so Ben can keep working in it and other runs can't collide with it. Say the worktree path and the branch it was cut from in the run log.
+- **Port.** Any local server a helper starts (`shopify theme dev`, a local WordPress) uses port `9300 + slot`, so runs on different sites never fight over one. Pass it to every helper with the repo path.
 - Start the run log (section 8).
 
 ## 2. The pipeline
@@ -117,7 +138,8 @@ Link it from the brief, the task, and the project's `Notes/_MOC.md`.
 
 - Brief: `status: review` (or `blocked`), `run_ended:`, `blocked_minutes:` (section 8), and the review note linked under `## Run log`.
 - Task: `status: review` (or `in-progress` on a halt), with `brief:` pointing back at the brief.
-- Repo: the run branch is committed and **not pushed**. Name it in the run log.
+- Repo: the run branch is committed and **not pushed**. Name it in the run log. Leave the worktree in place for Ben's review; he removes it (`git worktree remove`) when he's merged or dropped the branch.
+- Stop any local server the run started, so its port is free for the next run.
 
 ## 7. Notify
 
