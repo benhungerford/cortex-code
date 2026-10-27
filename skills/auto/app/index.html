@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Briefs</title>
+<style>
+  :root {
+    --bg: #f6f5f2; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6a66; --line: #e3e1db;
+    --accent: #2f5bd3; --danger: #b3261e;
+    --draft: #8a8780; --ready: #2f5bd3; --running: #b26a00; --review: #1f7a4d; --blocked: #b3261e;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151514; --panel: #1e1e1c; --ink: #ecebe7; --muted: #9a988f; --line: #33322e;
+      --accent: #7c9bff; --danger: #ff8a80;
+      --draft: #9a988f; --ready: #7c9bff; --running: #f0b04a; --review: #5fcf94; --blocked: #ff8a80;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  header { display: flex; align-items: center; gap: 16px; padding: 18px 24px; border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 18px; margin: 0; flex: 1; }
+  main { display: grid; grid-template-columns: minmax(300px, 420px) 1fr; min-height: calc(100vh - 63px); }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; } #detail { border-top: 1px solid var(--line); } }
+  #list { border-right: 1px solid var(--line); overflow-y: auto; }
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 2px 10px; font-size: 13px; cursor: pointer; }
+  .chip.on { color: var(--ink); border-color: var(--ink); }
+  .row { display: block; width: 100%; text-align: left; padding: 12px 16px; border: 0; border-bottom: 1px solid var(--line); background: none; color: inherit; font: inherit; cursor: pointer; }
+  .row:hover, .row.sel { background: var(--panel); }
+  .row .t { font-weight: 600; }
+  .row .m { color: var(--muted); font-size: 13px; display: flex; gap: 8px; align-items: center; }
+  .status { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  .s-draft { color: var(--draft); } .s-ready { color: var(--ready); } .s-running { color: var(--running); }
+  .s-review { color: var(--review); } .s-blocked { color: var(--blocked); }
+  #detail { padding: 24px 32px; overflow-y: auto; }
+  #detail h2 { margin: 0 0 4px; font-size: 22px; }
+  .sub { color: var(--muted); margin-bottom: 20px; }
+  label { display: block; font-weight: 600; margin: 18px 0 6px; }
+  label small { font-weight: 400; color: var(--muted); }
+  input, select, textarea { width: 100%; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+  textarea { min-height: 72px; resize: vertical; }
+  .actions { display: flex; gap: 10px; margin-top: 24px; align-items: center; flex-wrap: wrap; }
+  button.btn { font: inherit; border-radius: 8px; padding: 8px 16px; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .error { color: var(--danger); }
+  .ok { color: var(--review); }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin: 16px 0; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .stat b { display: block; font-family: var(--mono); font-size: 18px; }
+  .stat span { color: var(--muted); font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  td.n { font-family: var(--mono); text-align: right; }
+  th.n { text-align: right; }
+  .readonly { white-space: pre-wrap; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .log { font-family: var(--mono); font-size: 13px; white-space: pre-wrap; }
+  .empty { color: var(--muted); padding: 24px 16px; }
+  a { color: var(--accent); }
+  h3 { margin: 28px 0 8px; font-size: 15px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Briefs</h1>
+  <button class="btn" id="totalsBtn">Time by site</button>
+  <button class="btn primary" id="newBtn">New brief</button>
+</header>
+<main>
+  <section id="list"><div class="filters" id="filters"></div><div id="rows"></div></section>
+  <section id="detail"></section>
+</main>
+<script>
+const STATUSES = ["draft", "ready", "running", "review", "blocked"];
+const SECTIONS = [
+  ["What", "One to three sentences. What should exist when this is done?", true],
+  ["Designs", "Figma links, screenshots, Pastel links", true],
+  ["Where", "Staging or unlaunched site URL (the repo comes from the project)"],
+  ["Done looks like", "What you'd check first at review"],
+  ["Already decided", "Anything you've settled, so it doesn't guess. Site facts go here too (which form plugin, video embeds, etc.)"],
+  ["Don't touch", "Modules, apps or files to leave alone"],
+  ["Ask me before", "Anything you don't want guessed. These go to the top of the review list."],
+];
+let state = { briefs: [], totals: [], vault: "", filter: "active", selected: null, view: "list", dirty: false };
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const hm = m => m == null ? "—" : `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}`;
+const site = p => (p || "").replace("Work/TBL/", "").split("/")[0];
+const obsidian = path => `obsidian://open?vault=${encodeURIComponent(state.vault)}&file=${encodeURIComponent(path)}`;
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, { headers: { "Content-Type": "application/json" }, ...opts });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Something went wrong.");
+  return data;
+}
+
+async function refresh() {
+  const data = await api("/api/briefs");
+  Object.assign(state, data);
+  renderList();
+  if (state.view === "totals") renderTotals();
+  if (state.view === "brief" && !state.dirty) {
+    const b = state.briefs.find(b => b.file === state.selected);
+    if (b && !["draft", "ready"].includes(b.status)) openBrief(b.file, true);
+  }
+}
+
+function renderList() {
+  const counts = Object.fromEntries(STATUSES.map(s => [s, state.briefs.filter(b => !b.done && b.status === s).length]));
+  const filters = [["active", "Active"], ...STATUSES.map(s => [s, `${s[0].toUpperCase() + s.slice(1)} ${counts[s] || ""}`]), ["done", "Done"]];
+  $("#filters").innerHTML = filters.map(([k, label]) =>
+    `<button class="chip ${state.filter === k ? "on" : ""}" data-f="${k}">${esc(label.trim())}</button>`).join("");
+  const shown = state.briefs.filter(b =>
+    state.filter === "done" ? b.done :
+    state.filter === "active" ? !b.done :
+    !b.done && b.status === state.filter);
+  $("#rows").innerHTML = shown.length ? shown.map(b => `
+    <button class="row ${b.file === state.selected ? "sel" : ""}" data-file="${esc(b.file)}">
+      <div class="t">${esc(b.title)}</div>
+      <div class="m"><span class="status s-${esc(b.status)}">${esc(b.phase || b.status)}</span>
+        <span>${esc(site(b.project))}</span>
+        ${b.run_minutes != null ? `<span>· ${hm(b.run_minutes)}</span>` : ""}</div>
+    </button>`).join("") : `<div class="empty">No briefs here.</div>`;
+}
+
+function sectionFields(values = {}) {
+  return SECTIONS.map(([name, hint, req]) => `
+    <label>${esc(name)} ${req ? "<small>required</small>" : ""}</label>
+    <textarea data-section="${esc(name)}" placeholder="${esc(hint)}">${esc(values[name] || "")}</textarea>`).join("");
+}
+
+function collectSections() {
+  return Object.fromEntries([...document.querySelectorAll("[data-section]")].map(t => [t.dataset.section, t.value]));
+}
+
+async function newBrief() {
+  if (!confirmLeave()) return;
+  state.view = "new"; state.selected = null; state.dirty = false; renderList();
+  const { projects } = await api("/api/projects");
+  $("#detail").innerHTML = `
+    <h2>New brief</h2>
+    <div class="sub">Starts as a draft. Mark it ready when What and Designs are filled in.</div>
+    <label>Task name</label><input id="title" placeholder="e.g. Homepage hero">
+    <label>Project</label>
+    <select id="project"><option value="">Pick a project…</option>
+      ${projects.map(p => `<option value="${esc(p.path)}">${esc(p.label)}${p.git ? "" : " (not in git yet: can't run)"}</option>`).join("")}
+    </select>
+    ${sectionFields()}
+    <div class="actions"><button class="btn primary" id="create">Create draft</button><span id="msg"></span></div>`;
+  $("#create").onclick = async () => {
+    try {
+      const b = await api("/api/brief", { method: "POST", body: JSON.stringify({
+        title: $("#title").value, project: $("#project").value, sections: collectSections() }) });
+      state.dirty = false; await refresh(); openBrief(b.file);
+    } catch (e) { $("#msg").innerHTML = `<span class="error">${esc(e.message)}</span>`; }
+  };
+}
+
+async function openBrief(file, quiet) {
+  if (!quiet && !confirmLeave()) return;
+  const b = await api(`/api/brief?file=${encodeURIComponent(file)}`);
+  state.view = "brief"; state.selected = file; state.dirty = false; renderList();
+  const editable = ["draft", "ready"].includes(b.status);
+  const stats = b.run_minutes != null ? `
+    <div class="stats">
+      <div class="stat"><b>${hm(b.run_minutes)}</b><span>Run time</span></div>
+      <div class="stat"><b>${hm(b.build_minutes)}</b><span>Working</span></div>
+      <div class="stat"><b>${hm(b.queued_minutes)}</b><span>Waiting for site</span></div>
+      <div class="stat"><b>${hm(b.blocked_minutes)}</b><span>Blocked</span></div>
+    </div>` : "";
+  const steps = b.steps.length ? `
+    <h3>Steps</h3><table><tr><th>Step</th><th>Started</th><th class="n">Time</th></tr>
+    ${b.steps.map(s => `<tr><td>${esc(s.step)}</td><td>${esc(s.start)}</td><td class="n">${hm(s.minutes)}</td></tr>`).join("")}</table>` : "";
+  const review = b.review_note ? `<p>Review note: <a href="${obsidian(b.review_note)}">${esc(b.review_note.split("/").pop())}</a></p>` : "";
+  const body = editable ? sectionFields(b.sections) : SECTIONS.map(([name]) =>
+    b.sections[name] ? `<label>${esc(name)}</label><div class="readonly">${esc(b.sections[name])}</div>` : "").join("");
+  $("#detail").innerHTML = `
+    <h2>${esc(b.title)}</h2>
+    <div class="sub"><span class="status s-${esc(b.status)}">${esc(b.status)}</span> · ${esc(b.project.replace("Work/TBL/", ""))}
+      · <a href="${obsidian("_Briefs/" + b.file)}">Open in Obsidian</a></div>
+    ${review}${stats}${steps}
+    ${editable ? "" : `<p class="sub">A run has this brief, so it can't be edited here.</p>`}
+    ${body}
+    ${editable ? `<div class="actions">
+      <button class="btn" id="save">Save</button>
+      ${b.status === "draft" ? `<button class="btn primary" id="ready">Save and mark ready</button>`
+                              : `<button class="btn" id="draft">Back to draft</button>`}
+      <span id="msg"></span></div>` : ""}
+    ${b.run_log && !b.run_log.startsWith("_Filled in") ? `<h3>Run log</h3><div class="readonly log">${esc(b.run_log)}</div>` : ""}`;
+  const save = async status => {
+    try {
+      await api("/api/brief", { method: "PUT", body: JSON.stringify({ file: b.file, sections: collectSections(), status }) });
+      state.dirty = false; await refresh(); await openBrief(b.file, true);
+      $("#msg").innerHTML = `<span class="ok">Saved.</span>`;
+    } catch (e) { $("#msg").innerHTML = `<span class="error">${esc(e.message)}</span>`; }
+  };
+  if (editable) {
+    $("#save").onclick = () => save();
+    if ($("#ready")) $("#ready").onclick = () => save("ready");
+    if ($("#draft")) $("#draft").onclick = () => save("draft");
+  }
+}
+
+function renderTotals() {
+  state.view = "totals"; state.selected = null; renderList();
+  const rows = state.totals;
+  $("#detail").innerHTML = `<h2>Time by site</h2>
+    <div class="sub">Every brief that has started a run. "Working" is run time minus waiting and blocked time.</div>
+    ${rows.length ? `<table><tr><th>Site</th><th class="n">Runs</th><th class="n">Run time</th><th class="n">Working</th>
+      <th class="n">Waiting</th><th class="n">Blocked</th></tr>
+      ${rows.map(r => `<tr><td>${esc(r.project.replace("Work/TBL/", ""))}</td><td class="n">${r.runs}</td>
+        <td class="n">${hm(r.run_minutes)}</td><td class="n">${hm(r.build_minutes)}</td>
+        <td class="n">${hm(r.queued_minutes)}</td><td class="n">${hm(r.blocked_minutes)}</td></tr>`).join("")}</table>`
+      : `<p class="empty">No runs yet.</p>`}`;
+}
+
+function confirmLeave() {
+  return !state.dirty || confirm("You have unsaved changes. Leave anyway?");
+}
+
+document.addEventListener("input", e => { if (e.target.closest("#detail")) state.dirty = true; });
+$("#filters").addEventListener("click", e => { const f = e.target.dataset.f; if (f) { state.filter = f; renderList(); } });
+$("#rows").addEventListener("click", e => { const r = e.target.closest(".row"); if (r) openBrief(r.dataset.file); });
+$("#newBtn").onclick = newBrief;
+$("#totalsBtn").onclick = () => { if (confirmLeave()) { state.dirty = false; renderTotals(); } };
+window.addEventListener("beforeunload", e => { if (state.dirty) e.preventDefault(); });
+
+refresh().then(() => { if (state.briefs.length) renderTotals(); else newBrief(); });
+setInterval(refresh, 10000);
+</script>
+</body>
+</html>
