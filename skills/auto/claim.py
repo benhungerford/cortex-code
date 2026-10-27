@@ -2,12 +2,15 @@
 """Claim the next ready brief for an /auto pickup slot.
 
 Several slots fire on a timer and may fire at once, so the claim is made
-under a file lock: find the oldest `status: ready` brief whose site has
-room, flip it to `running`, and print what was claimed as JSON. Prints
+under a file lock: find the oldest `status: ready` brief, flip it to
+`running`, and print what was claimed as JSON. Prints
 `"claimed": null` with a reason when there is nothing to take.
 
 The run itself validates the brief (intake). This only decides who goes
-next and makes sure two slots never take the same brief.
+next and makes sure two slots never take the same brief. Briefs on one
+site plan in parallel; the steps that drive the site take turns through
+site_turn.py, not here. `--per-site` (0 = no limit) is kept for capping
+whole runs per site if that is ever needed.
 """
 import argparse
 import datetime as dt
@@ -86,7 +89,7 @@ def claim(vault: pathlib.Path, slot: int, max_total: int, per_site: int, now: dt
     ready.sort(key=lambda b: (b.get("created", ""), b["path"].stat().st_mtime))
     waiting = []
     for b in ready:
-        if busy.get(b.get("project", ""), 0) >= per_site:
+        if per_site and busy.get(b.get("project", ""), 0) >= per_site:
             waiting.append(b["path"].name)
             continue
         path = b["path"]
@@ -116,7 +119,7 @@ def main() -> int:
     parser.add_argument("--vault", required=True, type=pathlib.Path)
     parser.add_argument("--slot", required=True, type=int)
     parser.add_argument("--max-total", type=int, default=3)
-    parser.add_argument("--per-site", type=int, default=1)
+    parser.add_argument("--per-site", type=int, default=0)
     args = parser.parse_args()
 
     lock_path = args.vault / ".claude" / "cortex-auto" / "claim.lock"

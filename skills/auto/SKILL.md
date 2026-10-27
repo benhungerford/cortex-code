@@ -24,13 +24,13 @@ You are the **main agent**. You hold the brief, the status, and file paths — n
 python3 claim.py --vault "<vault>" --slot <slot>
 ```
 
-It takes the oldest ready brief whose site has no run going, flips it to `running` with `run_started` and `run_slot`, and prints JSON. It holds a lock while it does this, so two slots firing together never take the same brief.
+It takes the oldest ready brief, flips it to `running` with `run_started` and `run_slot`, and prints JSON. It holds a lock while it does this, so two slots firing together never take the same brief.
 
 - `"claimed": null` → nothing to do. Say the `reason` in one line and stop. **No notification**; an empty check every 15 minutes is not news.
-- `"stale"` lists briefs still `running` more than 8 hours after they started. A run that long has probably died and is holding its site. Name them in your one line. Don't touch them; Ben decides.
+- `"stale"` lists briefs still `running` more than 8 hours after they started. A run that long has probably died. Name them in your one line. Don't touch them; Ben decides.
 - A claimed brief → carry on from Intake with that brief.
 
-Limits live in `claim.py`'s flags: 3 runs at once in total, **1 per site** (`--per-site`). More than one per site waits on separate preview themes per brief and the bot-check question (OQ-04). The worktrees below already allow it.
+Up to 3 runs at once in total (`claim.py --max-total`), on any mix of sites. Briefs on the same site **plan in parallel and take turns on the site** — see *Site turns* below.
 
 The vault path comes from the `<cortex-session>` block, or `get_boot_context` from `cortex-vault` where there is no block.
 
@@ -98,6 +98,33 @@ Use `subagent_type: general-purpose` for every helper except the checker. Give e
 
 **Route-backs.** The tickets helper may come back saying the capture folder has a hole and naming the move that fills it — the same route-back create-tickets makes to a human. Run that move's helper (research, self-grill, or prototype) on just that hole, then run the tickets helper again. **At most two route-backs per run.** A third means the brief is missing something no helper can supply: block the run and say what.
 
+### Site turns
+
+Steps 1–4 and 6 only read and write files in the run's own worktree, so every brief on a site can do them at once. **Prototype, the build loop and QA as Ben drive the site in a browser**, and two runs doing that on one site at once would trip over each other's preview and the bot check. Those steps take the site's turn first:
+
+```bash
+python3 site_turn.py take --vault "<vault>" --site "<brief's project:>" --brief "_Briefs/<brief>.md" --step <prototype|build> --wait 540
+```
+
+- **Granted** (exit 0) → go ahead.
+- **Not yet** (exit 3) → it waited 9 minutes and you are `position` N in the queue behind `held_by`. Run the same command again. Turns go in the order runs asked, and a turn held by a run that is no longer `running` is freed by itself, so you never clear one by hand.
+- **Six hours waiting in total** → block the run: `waiting for <site> since <time>, behind <held_by>`. Something upstream has stuck.
+
+Give the turn back as soon as the steps that need it are done:
+
+```bash
+python3 site_turn.py give --vault "<vault>" --site "<brief's project:>" --brief "_Briefs/<brief>.md"
+```
+
+| Take before | Give back after |
+|---|---|
+| Step 5, prototype (and any prototype route-back) | The last prototype helper returns |
+| Step 7, the build loop | QA as Ben finishes, or a halt |
+
+Build and QA share one turn, so another run can't slip in between a QA send-back and its fix. Close out (section 6) always gives the turn back, whatever happened; giving back a turn you don't hold does nothing.
+
+Time spent waiting goes in the run log on its own line and in the brief's `queued_minutes:`. It is neither build time nor blocked time.
+
 ## 3. The build loop
 
 You run this, because build's checker is a separate agent and a helper cannot spawn one. It is build's own loop (build `SKILL.md`, section 4) with the roles split across agents. Read build's section 4 and its Exit conditions before the first round.
@@ -136,7 +163,8 @@ Link it from the brief, the task, and the project's `Notes/_MOC.md`.
 
 ## 6. Close out
 
-- Brief: `status: review` (or `blocked`), `run_ended:`, `blocked_minutes:` (section 8), and the review note linked under `## Run log`.
+- Site turn: run `site_turn.py give` (section 2, *Site turns*), even on a block or halt.
+- Brief: `status: review` (or `blocked`), `run_ended:`, `blocked_minutes:` and `queued_minutes:` (section 8), and the review note linked under `## Run log`.
 - Task: `status: review` (or `in-progress` on a halt), with `brief:` pointing back at the brief.
 - Repo: the run branch is committed and **not pushed**. Name it in the run log. Leave the worktree in place for Ben's review; he removes it (`git worktree remove`) when he's merged or dropped the branch.
 - Stop any local server the run started, so its port is free for the next run.
@@ -155,6 +183,8 @@ The notification belongs to this session, so opening it opens this session — t
 Format in `run-log.md`. Write it as you go, never reconstructed at the end: a run that dies mid-step should leave a log that says where.
 
 `blocked_minutes` is time the run spent unable to proceed for reasons outside the work — an environment that wouldn't stand up and was retried, a bot-protection cool-down. It is kept apart so a slow environment doesn't read as a slow build. A run that ends blocked counts nothing after the block.
+
+`queued_minutes` is time spent waiting for the site's turn behind another brief. It is kept apart for the same reason: a queue is not a slow build.
 
 ## 9. When something goes wrong that this file doesn't cover
 
