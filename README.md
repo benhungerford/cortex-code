@@ -34,6 +34,7 @@ One task has one or more tickets. Usually one. A homepage is one invoice and fiv
 
 /auto                      one brief from the vault's _Briefs/, end to end, unattended;
                            stops at review and pings Ben (TBL, unlaunched sites only)
+/learn                     fold Ben's marks on reviewed /auto notes into his profile
 ```
 
 The order above is a default, not a gate. Tasks may exist before ideation runs, and often will — a client sends a list, and you ideate each item. Ideation may equally run first and produce the tasks. `/create-tickets` reads whatever exists and does not care which came first. Foundation and ideation are both skippable; a thirty-minute CSS fix goes straight to `/create-tickets`, and when it is unclear the move asks.

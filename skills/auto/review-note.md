@@ -10,7 +10,7 @@ type: qa-note
 source: auto
 brief: "_Briefs/<brief>.md"        # plain paths: the vault keeps wikilinks out of frontmatter
 task: "<vault path of the task file>"
-status: unreviewed          # unreviewed → reviewed (Ben sets it)
+status: unreviewed          # unreviewed → reviewed (Ben sets it) → learned (/learn sets it)
 profile: v<N>
 created: <YYYY-MM-DDTHH:mm>
 updated: <YYYY-MM-DDTHH:mm>
@@ -55,6 +55,7 @@ Every `high` guess, one line each, no checkbox. Skim it; flag anything wrong by 
 1. Tick each guess that was right. For a wrong one, write the real answer after *Your answer:*. Your words, not a correction of mine.
 2. Set `status: reviewed`.
 3. Then run `/qa <task>` as usual. Your answers here are not acceptance.
+4. When you have a few reviewed notes, run `/learn` to fold your answers into the profile.
 
 ---
 *Related:* [[_MOC]] · [[<project> — Project Context]]
@@ -65,4 +66,4 @@ Every `high` guess, one line each, no checkbox. Skim it; flag anything wrong by 
 - **Riskiest first,** because review time is limited and a wrong `low` guess costs more than a wrong `high` one. The back-test showed `low` guesses right only 23% of the time.
 - **Checkboxes on guesses, not on outcomes.** Ben is grading the profile here, not the build. `/qa` grades the build.
 - **"Your answer" in his own words,** because those words become profile rules. A ticked box says the profile was right; a written answer is a new rule or a correction to one.
-- **`status: reviewed`** is how a later pass finds the notes whose answers are ready to fold into the profile.
+- **`status: reviewed`** is how `/learn` finds the notes whose answers are ready to fold into the profile. It sets `learned` once they are in.
