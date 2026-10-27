@@ -29,7 +29,7 @@ Work the tree exactly as grill-me says — frontier by frontier, a recommendatio
 
 Two answers are not decisions:
 
-- **Motion whose feel is uncertain** (profile A9) → route to prototype. Write the question to `## Routed to prototype` with what the prototype must compare, and treat everything downstream of it as waiting.
+- **Motion whose feel is uncertain** (profile A9). Ben would prototype this, but `/prototype` is his tool, not the run's. Decide it from the research and any named reference site, tag it `low`, and build it with the values that set the feel (offsets, easing, durations) kept easy to tune. Add a line under it: `prototype:` what a prototype should compare, so the review note can tell Ben it's worth one before he accepts.
 - **A fact only Ben would know** — which form plugin, which video host, who owns a section — that the brief, research, foundation, and profile section 5 don't settle → answer it from the repo's existing pattern, tag it `low`, and say it's a fact, not a preference.
 
 Facts from the profile's section 5 beat any rule.
@@ -41,8 +41,7 @@ Write `.cortex/<slug>/grill-NN.md` in grill-me's format, with these additions:
 - Frontmatter adds `answered_by: auto` and `profile: v<version from the profile's frontmatter>`.
 - Every settled item carries a tag before the answer: `[brief]`, or `[auto · high|medium|low]`.
 - After each `[auto · …]` answer, on its own line: `basis:` the profile rule ID or research file it rests on, and `if wrong:` what would have to change (one line, the rework a wrong guess costs).
-- `## Routed to prototype` — new section, after `## Still open`.
-- `## Still open` must be empty unless a question is waiting on a prototype. You don't get to defer; deferral is a human's privilege.
+- `## Still open` must be empty. You don't get to defer; deferral is a human's privilege.
 
 ```markdown
 - **Hover on the card arrow** — [auto · medium] Color change only, no underline.
@@ -55,5 +54,5 @@ Write `.cortex/<slug>/grill-NN.md` in grill-me's format, with these additions:
 ```
 file: <path of grill-NN.md>
 answered: <total> (<brief> brief, <high> high, <medium> medium, <low> low)
-routed_to_prototype: <none | one line per question>
+worth_prototyping: <none | one line per question>
 ```

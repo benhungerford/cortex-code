@@ -11,8 +11,7 @@ Read `skills/create-tickets/SKILL.md` in the Cortex Code plugin and follow it �
 ## Overrides
 
 - **Self-grill answers are settled decisions.** The `grill-*.md` was written by auto, and every answer is tagged `[auto · …]`. Treat them exactly as create-tickets treats Ben's answers — don't relitigate them — but carry the tag into the ticket's `## Decisions taken at ticket` line for any decision that rests on one: `(auto · medium — see grill-01)`. Ben reads the ticket and must be able to see which decisions were his and which were guessed.
-- **A provisional prototype verdict is a decision**, tagged the same way: `(auto · provisional prototype — see prototype-01)`.
-- **Route-back goes to the main agent, not a human.** If section 4's judgment says the capture folder has a hole, don't write a ticket. Return `route_back:` naming the hole and the move that fills it (`research`, `self-grill`, or `prototype`). The main agent runs it and calls you again.
+- **Route-back goes to the main agent, not a human.** If section 4's judgment says the capture folder has a hole, don't write a ticket. Return `route_back:` naming the hole and the move that fills it (`research` or `self-grill`). The main agent runs it and calls you again.
 - **"Ask what the last project taught you"** — answer the ledger questions from the profile and `Knowledge Base/ticket-gaps.md` if it exists. Tag each answer `[auto]` in the ticket.
 - **A split needs no approval.** Decide it per create-tickets section 5, write the numbered tickets, and record the split (count, one line per ticket, the order) in your return.
 - **"How this gets verified" must name an environment a checker can reach unattended** — a URL that loads without a login, or a local server and the command that starts it. If none exists, that's a route-back to research, not a guess.

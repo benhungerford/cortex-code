@@ -27,9 +27,10 @@ tags:
 
 ## Check these first
 
-The guesses most likely to cost rework if wrong. Every `low` guess, every provisional prototype pick, and every `## Ask me before` item, ordered by the size of its `if wrong:`.
+The guesses most likely to cost rework if wrong. Every `low` guess and every `## Ask me before` item, ordered by the size of its `if wrong:`.
 
 - [ ] **<question>** — guessed: <answer>. <one line on why>. *If wrong:* <rework>. `low` · <basis>
+  - Worth prototyping first: <what to compare>   ← only when the grill marked it
   - Your answer: 
 
 ## Also guessed

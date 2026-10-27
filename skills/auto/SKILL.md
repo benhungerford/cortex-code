@@ -8,9 +8,11 @@ disable-model-invocation: true
 
 Run a brief through the whole Cortex Code workflow unattended, and stop at `review`.
 
-Every other move in this plugin has a point where it waits for Ben: grill-me waits for answers, create-tasks for approval of the set, create-tickets for approval of a split, build for a run mode, prototype for a verdict, qa for acceptance. This move runs the same moves with each of those waits replaced by something written down — a decision taken from Ben's profile, tagged with how sure it was, and listed on a review note he reads afterwards. **Nothing is decided silently.** A run that guessed and said so is useful; a run that guessed and didn't is worse than no run.
+Every other move in this plugin has a point where it waits for Ben: grill-me waits for answers, create-tasks for approval of the set, create-tickets for approval of a split, build for a run mode, qa for acceptance. This move runs the same moves with each of those waits replaced by something written down — a decision taken from Ben's profile, tagged with how sure it was, and listed on a review note he reads afterwards. **Nothing is decided silently.** A run that guessed and said so is useful; a run that guessed and didn't is worse than no run.
 
 You are the **main agent**. You hold the brief, the status, and file paths — never the work itself. Every step runs as a fresh helper (an `Agent` call) that reads its inputs from disk, writes its outputs to disk, and reports back in a few lines. That is what lets one session run all day: your context grows by a few lines per step, not by a repo's worth of reading. It is also the existing plugin rule that every move starts cold from its file, applied without a `/clear`.
+
+**`/prototype` is never run.** It is a tool for Ben to use by hand: it builds options for a person to flip between and judge. A question that would need one is decided from research, tagged `low`, and marked on the review note as worth prototyping before he accepts.
 
 **Helpers cannot start their own helpers.** Any step that would normally spawn an agent — build's checker, research's background reader, grill-me's fact-finding sub-agent — has that part done inline by the helper, or done by you. The build loop is the one that matters: you run it.
 
@@ -88,40 +90,34 @@ Run these in order. Each row is one helper unless it says otherwise. Before each
 | 2 | Foundation | `helpers/foundation.md` | `.cortex/foundation/` already exists |
 | 3 | Research | `helpers/research.md` — one helper per question, run in parallel | Never; there is always at least the design-vs-repo question |
 | 4 | Self-grill | `helpers/self-grill.md` | Never |
-| 5 | Prototype | `helpers/prototype.md` — one per question the grill routed | The grill routed nothing |
-| 6 | Tickets | `helpers/tickets.md` | Never |
-| 7 | Build loop | Section 3 below — you run it | Never |
-| 8 | QA as Ben | `helpers/qa-as-ben.md` | Never |
-| 9 | Wrap | Sections 5–7 below — you do it | Never |
+| 5 | Tickets | `helpers/tickets.md` | Never |
+| 6 | Build loop | Section 3 below — you run it | Never |
+| 7 | QA as Ben | `helpers/qa-as-ben.md` | Never |
+| 8 | Wrap | Sections 5–7 below — you do it | Never |
 
 Use `subagent_type: general-purpose` for every helper except the checker. Give each helper: the vault path, the repo path, the brief path, the task slug once step 1 has set it, the run branch, and its helper brief **verbatim**. Never paraphrase a helper brief; the overrides in it are the contract.
 
-**Route-backs.** The tickets helper may come back saying the capture folder has a hole and naming the move that fills it — the same route-back create-tickets makes to a human. Run that move's helper (research, self-grill, or prototype) on just that hole, then run the tickets helper again. **At most two route-backs per run.** A third means the brief is missing something no helper can supply: block the run and say what.
+**Route-backs.** The tickets helper may come back saying the capture folder has a hole and naming the move that fills it — the same route-back create-tickets makes to a human. Run that move's helper (research or self-grill) on just that hole, then run the tickets helper again. **At most two route-backs per run.** A third means the brief is missing something no helper can supply: block the run and say what.
 
 ### Site turns
 
-Steps 1–4 and 6 only read and write files in the run's own worktree, so every brief on a site can do them at once. **Prototype, the build loop and QA as Ben drive the site in a browser**, and two runs doing that on one site at once would trip over each other's preview and the bot check. Those steps take the site's turn first:
+Steps 1–5 only read and write files in the run's own worktree, so every brief on a site can do them at once. **The build loop and QA as Ben drive the site in a browser**, and two runs doing that on one site at once would trip over each other's preview and the bot check. Those steps take the site's turn first:
 
 ```bash
-python3 site_turn.py take --vault "<vault>" --site "<brief's project:>" --brief "_Briefs/<brief>.md" --step <prototype|build> --wait 540
+python3 site_turn.py take --vault "<vault>" --site "<brief's project:>" --brief "_Briefs/<brief>.md" --step build --wait 540
 ```
 
 - **Granted** (exit 0) → go ahead.
 - **Not yet** (exit 3) → it waited 9 minutes and you are `position` N in the queue behind `held_by`. Run the same command again. Turns go in the order runs asked, and a turn held by a run that is no longer `running` is freed by itself, so you never clear one by hand.
 - **Six hours waiting in total** → block the run: `waiting for <site> since <time>, behind <held_by>`. Something upstream has stuck.
 
-Give the turn back as soon as the steps that need it are done:
+Give the turn back once QA as Ben finishes, or on a halt:
 
 ```bash
 python3 site_turn.py give --vault "<vault>" --site "<brief's project:>" --brief "_Briefs/<brief>.md"
 ```
 
-| Take before | Give back after |
-|---|---|
-| Step 5, prototype (and any prototype route-back) | The last prototype helper returns |
-| Step 7, the build loop | QA as Ben finishes, or a halt |
-
-Build and QA share one turn, so another run can't slip in between a QA send-back and its fix. Close out (section 6) always gives the turn back, whatever happened; giving back a turn you don't hold does nothing.
+Take it once, before step 6. Build and QA share one turn, so another run can't slip in between a QA send-back and its fix. Close out (section 6) always gives the turn back, whatever happened; giving back a turn you don't hold does nothing.
 
 Time spent waiting goes in the run log on its own line and in the brief's `queued_minutes:`. It is neither build time nor blocked time.
 
@@ -157,7 +153,7 @@ When every ticket clears, run `helpers/qa-as-ben.md`. It walks the built pages t
 
 Write it to the project's `Notes/` folder as `<YYYY-MM-DD> Auto Review — <brief title>.md`, in the format in `review-note.md`. It is the most important thing a run produces: it is how Ben checks the run's guesses and how the profile learns.
 
-Collect its contents from disk, not from memory: every `[auto · <confidence>]` item in the run's `grill-*.md` files, every prototype verdict marked provisional, every split and slug call the task and tickets helpers recorded, every blocked criterion, and every known issue from section 4.
+Collect its contents from disk, not from memory: every `[auto · <confidence>]` item in the run's `grill-*.md` files (with its `prototype:` line where it has one), every split and slug call the task and tickets helpers recorded, every blocked criterion, and every known issue from section 4.
 
 Link it from the brief, the task, and the project's `Notes/_MOC.md`.
 

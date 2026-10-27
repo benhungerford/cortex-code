@@ -2,8 +2,8 @@
 """Take or give back a site's turn for the steps that use the live site.
 
 Briefs on the same site plan in parallel, but only one at a time may run
-the steps that drive the site in a browser (prototype, build, QA). Those
-steps take the site's turn first. Waiting runs queue in the order they
+the steps that drive the site in a browser (the build loop and QA as
+Ben). Those steps take the site's turn first. Waiting runs queue in the order they
 asked, and a turn held by a brief that is no longer `running` (its run
 died, ended, or blocked without giving it back) is freed automatically.
 

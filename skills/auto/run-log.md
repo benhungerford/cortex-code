@@ -10,9 +10,8 @@ The run log lives under the brief's `## Run log` heading. Write each line as the
 - 09:03 → 09:05 · **Task** · `homepage-hero`, one task
 - 09:05 → 09:05 · **Foundation** · skipped, exists
 - 09:05 → 09:21 · **Research** · 3 questions in parallel · 1 unreachable: Figma node 1:234 (permission)
-- 09:21 → 09:34 · **Self-grill** · 31 answered (4 brief, 12 high, 11 medium, 4 low) · 1 to prototype
-- 09:34 → 10:02 · **Prototype** · expand mechanics · picked B (provisional)
-- 10:02 → 10:19 · **Tickets** · 3 tickets · 0 route-backs
+- 09:21 → 09:34 · **Self-grill** · 31 answered (4 brief, 12 high, 11 medium, 4 low) · 1 worth prototyping
+- 09:34 → 10:19 · **Tickets** · 3 tickets · 0 route-backs
 - 10:19 → 10:47 · **Waiting for site turn** · behind `TBL team` (build) · 28 min queued
 - 10:47 → 11:48 · **Build** · 01 cleared in 3 rounds · 02 cleared in 5 · 03 cleared in 2, 1 blocked
 - 11:48 → 12:05 · **QA as Ben** · round 1: 2 send-backs · round 2: clean · 1 taste flag
