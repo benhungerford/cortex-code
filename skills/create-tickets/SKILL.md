@@ -119,44 +119,29 @@ created: 2026-08-06
 # Sticky add-to-cart on mobile PDP
 
 ## Intent
-
-What the work is and why it exists. The problem in the shopper's terms, then
-the fix in the developer's. Include how to reproduce it.
+The problem in the shopper's terms, the fix in the developer's, how to reproduce it.
 
 ### What the repo says
-
-Findings with file and line references. The hazards you found, and what each
-one rules out.
+Findings and hazards with file and line references, and what each rules out.
 
 ## Decisions taken at ticket
 
-- Bar proxies to the real submit button rather than posting its own request.
-- Mobile only. Desktop is unchanged.
-
 ## Acceptance criteria
-
 - [ ] ...
 
 ## How this gets verified
-
 The environment, and the fallback if it is unavailable.
 
 ---
 ```
 
-The `---` at the end is the divider. Everything below it belongs to `/build` and `/qa`.
+The closing `---` is the divider. Everything below it belongs to `/build` and `/qa`.
 
 ### Writing criteria
 
-Criteria are the definition of done, and they are also what the audit measures this ticket against later. Write each one so that a person in a browser can say *what they saw*.
+Write each criterion so a person in a browser can say what they saw. "The cart line comes back with `selling_plan` set and a price of $18.70" is a criterion; "the bar uses the existing form" is a decision and goes in Decisions. One thing per criterion, with its conditions named (viewport width, variant, state). Every hazard research found gets one, and so do the states nobody demonstrates: sold out, no variant selected, empty cart, the longest product title on the store.
 
-- **Observable, not architectural.** "The cart line comes back with `selling_plan` set and a price of $18.70" can be ticked. "The bar uses the existing form" cannot — it is a decision, and it belongs in Decisions.
-- **One thing each.** A criterion joined by "and" produces a half-tick nobody can record.
-- **Name the conditions.** Which viewport width, which variant, which state. A criterion that does not say where to stand cannot be failed honestly.
-- **Encode the hazards you found.** If research turned up a third-party app, a stacking context, or an async write, there is a criterion for it. These are the ones that pay for the research.
-- **Include the states nobody demonstrates.** Sold out, no variant selected, empty cart, one item, the longest product title on the store.
-
-Then read them back and ask: *if every one of these were ticked, could the screen still be wrong?* On the pilot the answer was yes — every criterion was satisfiable in a state where the bar showed $22.00 and the cart charged $18.70. If the answer is yes, there is a criterion missing.
+Then ask: if every criterion were ticked, could the screen still be wrong? On the pilot every criterion was satisfiable while the bar showed $22.00 and the cart charged $18.70. If the answer is yes, a criterion is missing.
 
 ## 7. The completeness gate
 

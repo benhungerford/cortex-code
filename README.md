@@ -31,6 +31,12 @@ One task has one or more tickets. Usually one. A homepage is one invoice and fiv
 /create-tickets            task + capture + foundation → one or more tickets
 /build                     asks: one at a time, all sequentially, or all in parallel
 /qa                        one task, or a CSV/doc of edits spanning many tickets
+
+/auto                      one brief from the vault's _Briefs/, end to end, unattended;
+                           stops at review and pings Ben (TBL, unlaunched sites only)
+/learn                     fold Ben's marks on reviewed /auto notes into his profile
+
+skills/auto/app/server.py  the brief app: write briefs, mark them ready, watch runs and time
 ```
 
 The order above is a default, not a gate. Tasks may exist before ideation runs, and often will — a client sends a list, and you ideate each item. Ideation may equally run first and produce the tasks. `/create-tickets` reads whatever exists and does not care which came first. Foundation and ideation are both skippable; a thirty-minute CSS fix goes straight to `/create-tickets`, and when it is unclear the move asks.
@@ -117,6 +123,15 @@ A second, optional axis rides after the origin tag: `refines criterion N`. It se
 What QA learns at sign-off does not stay on the one ticket. Cross-project patterns — anything phraseable as a question `/create-tickets` should ask next time — land in `<vault>/Knowledge Base/ticket-gaps.md`. `/create-tickets` reads that file before the next ticket's criteria freeze, and a pattern that cost one project's QA round costs nothing on the next. That is the loop the origin tags were always pointing at and never closed.
 
 ## Status
+
+`3.0.0` — updated for compatibility with Claude Opus 5.5 and Fable 5.2.
+
+- **First release of `/auto`, `/learn` and the brief app.** `/auto` runs one brief from the vault's `_Briefs/` end to end without Ben; `/learn` folds his marks on reviewed runs into his profile; the brief app is a local page over `_Briefs/`.
+- **Guard hooks** (`hooks/`). Each blocking path exits 2 and prints the reason. In an unattended Auto run, pushes, deploys and uploads are blocked; a task cannot be moved to `done`; and a run cannot close as `review` without a verdict, a screenshot and a passing code check. In every session, the top of a ticket (above the divider) cannot be overwritten. The Bash guard reads the command line only: it cannot see inside npm or make scripts, script files, aliases or interpreter code, and the hooks do nothing if `python3` is not on the path.
+- **A read-only checker agent** (`agents/cortex-checker.md`): Read, Grep, Glob and the browser tools, with no shell and no file writing. `/build` and `/auto` spawn it as `cortex-code:cortex-checker`.
+- **Models set per role.** The Auto coordinator is meant to run on Fable 5.2; the builder and checker agents are set to `opus`.
+- **One shared browser reference**, `skills/_shared/references/browser-verification.md`, used by build, qa and the checker in place of three copies.
+- **Trimmed skills.** build and qa are about 40% shorter; descriptions fit the 200-character limit.
 
 `2.3.0` — the full chain, from a loose idea to a signed-off build. Nine moves: `foundation`, `ideation`, `grill-me`, `research`, `prototype`, `create-tasks`, `create-tickets`, `build`, `qa`, written against the task/ticket model in [`docs/design/2026-08-04-task-and-ticket-model.md`](docs/design/2026-08-04-task-and-ticket-model.md) and the expansion in [`docs/design/2026-08-05-workflow-expansion-design.md`](docs/design/2026-08-05-workflow-expansion-design.md).
 

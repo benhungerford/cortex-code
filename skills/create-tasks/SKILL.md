@@ -20,11 +20,7 @@ The same applies to `Not yet specified`. A map is only finished when that sectio
 
 ## What a task is
 
-Not a ticket, and not a substitute for one. A task is the billing unit — it names the client and the price and it stops there. A ticket is a build session's brief, written later by `/create-tickets`, and it carries the intent, the decisions, and the criteria a cold `/build` needs. This move produces the first; it never touches the second, and a proposed task table with build steps or acceptance criteria in it has drifted into writing tickets by another name.
-
-It lives in the vault, or arrives from Monday and is mirrored there. It carries the human's own hours, rate, and billing state, and a short client-readable summary of what shipped — what you would show the client, not what you'd hand a build session. Tasks never nest. `parent:` is a grouping label and nothing more; it groups a view, and no move ever resolves anything through it.
-
-The task and ticket model covers this with two shapes, and a proposed set should recognize which one it's drawing. A site audit is nine independent tasks that share `parent: "Q3 audit"`, each billed on its own and each with its own ticket. A homepage rebuild is the opposite: one task, because the client is billed for one deliverable, with five tickets underneath it doing the five sections of work. Getting this wrong in either direction either fragments one deliverable into a client-facing invoice with nine line items, or buries nine independent pieces of work inside one task nobody can bill piecemeal.
+A task is the billing unit, not a ticket. Read "The model" in `../../docs/design/2026-08-04-task-and-ticket-model.md` (relative to this skill's folder) for what it carries and the two shapes a set can take (nine audit tasks sharing a `parent:`, or one homepage task with five tickets), and say which shape the proposal is. A proposed table with build steps or acceptance criteria in it has drifted into writing tickets.
 
 ## Name the task for what it is
 
