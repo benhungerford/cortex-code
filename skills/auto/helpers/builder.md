@@ -22,7 +22,8 @@ The main agent tells you one of:
 - **You may look at the page** to orient yourself, but your look is not a verdict. Don't report anything as working; report what you changed.
 - **A fix that needs something above the divider** — stop, change nothing, and return `above_divider:` with what it would need. That is a conversation, and the main agent will halt the run.
 - **Don't write `.cortex/foundation/`** except in `write-up`.
-- **Browser rules** from build section 4 bind you too: one load, one `evaluate`, never poll, never work around bot protection.
+- **Browser rules** in `skills/_shared/references/browser-verification.md` bind you too.
+- **The code check runs when you return.** A hook runs `shopify theme check` (or `php -l` on WordPress) on the files this run changed and sends back any errors. Fix them and commit before you return again.
 
 ## Return (under 10 lines)
 

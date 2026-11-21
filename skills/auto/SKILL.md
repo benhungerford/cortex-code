@@ -10,9 +10,11 @@ Run a brief through the whole Cortex Code workflow unattended, and stop at `revi
 
 Every other move in this plugin has a point where it waits for Ben: grill-me waits for answers, create-tasks for approval of the set, create-tickets for approval of a split, build for a run mode, qa for acceptance. This move runs the same moves with each of those waits replaced by something written down — a decision taken from Ben's profile, tagged with how sure it was, and listed on a review note he reads afterwards. **Nothing is decided silently.** A run that guessed and said so is useful; a run that guessed and didn't is worse than no run.
 
-You are the **main agent**. You hold the brief, the status, and file paths — never the work itself. Every step runs as a fresh helper (an `Agent` call) that reads its inputs from disk, writes its outputs to disk, and reports back in a few lines. That is what lets one session run all day: your context grows by a few lines per step, not by a repo's worth of reading. It is also the existing plugin rule that every move starts cold from its file, applied without a `/clear`.
+You are the **main agent**. You hold the brief, the status, and file paths — never the work itself. Every step runs as a fresh helper (an `Agent` call) that reads its inputs from disk, writes its outputs to disk, and reports back in a few lines, so one session can run all day.
 
-**`/prototype` is never run.** It is a tool for Ben to use by hand: it builds options for a person to flip between and judge. A question that would need one is decided from research, tagged `low`, and marked on the review note as worth prototyping before he accepts.
+**Models.** Run the main agent on Fable 5.2 (`claude-fable-5-2`); the scheduled slots start their sessions on it. Every helper runs on `model: opus`: pass it on each `general-purpose` call, and the plugin's builder and checker agents set it themselves.
+
+**`/prototype` is never run.** It builds options for Ben to judge by hand. A question that would need one is decided from research, tagged `low`, and marked on the review note as worth prototyping before he accepts.
 
 **Helpers cannot start their own helpers.** Any step that would normally spawn an agent — build's checker, research's background reader, grill-me's fact-finding sub-agent — has that part done inline by the helper, or done by you. The build loop is the one that matters: you run it.
 
@@ -44,11 +46,11 @@ Read, once, before starting:
 
 ## Guardrails that hold for the whole run
 
-These sit on top of every guardrail in every move this skill runs. Nothing here relaxes those.
+These sit on top of every guardrail in every move this skill runs. Nothing here relaxes those. The plugin's hooks enforce the first three, so a blocked tool call with one of these reasons is the guardrail working: note it and carry on without that step.
 
-- **Never move a task to `done`.** `review` is as far as a run goes. Only Ben accepts.
-- **Never tick a criterion.** The checker's observation is the only thing that clears one.
-- **Never push, deploy, or upload.** Work stays on the run's branch, committed locally. (Deploy timing is open — OQ-07 in the project hub. Until it closes, a run ends with a branch, not a release.)
+- **`review` is as far as a run goes.** Only Ben moves a task to `done`, and a done task's frontmatter is his.
+- **Criteria are cleared by the checker's observation, not ticked.** The text above a ticket's divider stays as written.
+- **Nothing leaves the machine.** No push, theme push or publish, upload or remote WP-CLI. Work stays on the run's branch, committed locally. (Deploy timing is open — OQ-07 in the project hub. Until it closes, a run ends with a branch, not a release.)
 - **Never touch a launched site.** The intake check below is not optional and is re-run if a run resumes.
 - **Never write hours or estimates** on the task. Timing goes on the brief, as run time, never as billable time.
 - **Every guess goes on the review note.** If a helper took a decision Ben would normally take, it is on the list with its confidence, its basis, and what changes if it is wrong.
@@ -77,6 +79,7 @@ Then:
   ```
 
   **From here on, "the repo" means this worktree.** Give its path to every helper as the repo path. The main checkout is never written by a run, so Ben can keep working in it and other runs can't collide with it. Say the worktree path and the branch it was cut from in the run log.
+- **Evidence folder.** `~/.cortex-auto/evidence/<registry id>/<brief-slug>/`, outside the worktree so nothing in it is committed. It starts empty: when the run's worktree is added, a hook renames any folder an earlier run of the same brief left there (`<slug>.before-<timestamp>`), and files older than this run are ignored. Checker verdicts go in it as `verdict-<ticket NN>-round-<N>.md` (you write them, from the checker's return), screenshots in its `screenshots/` (you copy them there from the paths the checker returns), and the code check's output in `theme-check.txt`. A hook won't let the run end at `review` without a verdict, a screenshot, and a passing code check.
 - **Port.** Any local server a helper starts (`shopify theme dev`, a local WordPress) uses port `9300 + slot`, so runs on different sites never fight over one. Pass it to every helper with the repo path.
 - Start the run log (section 8).
 
@@ -95,7 +98,7 @@ Run these in order. Each row is one helper unless it says otherwise. Before each
 | 7 | QA as Ben | `helpers/qa-as-ben.md` | Never |
 | 8 | Wrap | Sections 5–7 below — you do it | Never |
 
-Use `subagent_type: general-purpose` for every helper except the checker. Give each helper: the vault path, the repo path, the brief path, the task slug once step 1 has set it, the run branch, and its helper brief **verbatim**. Never paraphrase a helper brief; the overrides in it are the contract.
+Use `subagent_type: general-purpose` with `model: opus` for every helper except the builder (`cortex-code:cortex-builder`) and the checker (`cortex-code:cortex-checker`). Give each helper: the vault path, the repo path, the brief path, the task slug once step 1 has set it, the run branch, and its helper brief **verbatim**. Never paraphrase a helper brief; the overrides in it are the contract.
 
 **Route-backs.** The tickets helper may come back saying the capture folder has a hole and naming the move that fills it — the same route-back create-tickets makes to a human. Run that move's helper (research or self-grill) on just that hole, then run the tickets helper again. **At most two route-backs per run.** A third means the brief is missing something no helper can supply: block the run and say what.
 
@@ -127,8 +130,8 @@ You run this, because build's checker is a separate agent and a helper cannot sp
 
 For each ticket, in number order (build's **all, sequentially** mode — the recommended one; never parallel in a run):
 
-1. **Builder.** A helper with `helpers/builder.md`. On the first round it implements the ticket. On later rounds it gets the checker's last failure list verbatim and fixes those items only. It commits on the run branch each round and returns the files it changed, one line each.
-2. **Checker.** An `Agent` with `subagent_type: Explore`, synchronous, given `helpers/checker.md` plus everything build section 4 says a checker gets — criteria verbatim, unresolved QA items verbatim, what changed this round (from the builder's return), the URLs, the browser rules verbatim. **Never** pass on the builder's own claims about what works.
+1. **Builder.** An `Agent` with `subagent_type: cortex-code:cortex-builder`, given `helpers/builder.md`. On the first round it implements the ticket. On later rounds it gets the checker's last failure list verbatim and fixes those items only. It commits on the run branch each round and returns the files it changed, one line each. A hook holds it until the code check passes on the files the run changed.
+2. **Checker.** An `Agent` with `subagent_type: cortex-code:cortex-checker` (read-only: no Bash, no Write), synchronous, given `helpers/checker.md` plus everything build section 4 says a checker gets — criteria verbatim, unresolved QA items verbatim, what changed this round (from the builder's return), the URLs, and the browser rules. For the rules, read `../_shared/references/browser-verification.md` from this skill's folder and paste its text into the prompt; the checker has no Bash and doesn't know where the plugin is installed. **Never** pass on the builder's own claims about what works. Write its return to the evidence folder as `verdict-<ticket NN>-round-<N>.md`, and copy every screenshot path it lists into the evidence folder's `screenshots/` (`cp`), since the checker can't write files.
 3. **Judge the round yourself** against build's exit conditions:
    - Every item pass or blocked → the ticket clears. Go to 4.
    - Same item failing two rounds running with the checker's observation unchanged → **stall**. Halt the whole loop.
@@ -159,11 +162,17 @@ Link it from the brief, the task, and the project's `Notes/_MOC.md`.
 
 ## 6. Close out
 
+In this order:
+
 - Site turn: run `site_turn.py give` (section 2, *Site turns*), even on a block or halt.
-- Brief: `status: review` (or `blocked`), `run_ended:`, `blocked_minutes:` and `queued_minutes:` (section 8), and the review note linked under `## Run log`.
-- Task: `status: review` (or `in-progress` on a halt), with `brief:` pointing back at the brief.
-- Repo: the run branch is committed and **not pushed**. Name it in the run log. Leave the worktree in place for Ben's review; he removes it (`git worktree remove`) when he's merged or dropped the branch.
 - Stop any local server the run started, so its port is free for the next run.
+- Code check: run `python3 ../../hooks/stop_gate.py check "<worktree>"` from this skill's folder. It runs `shopify theme check` (or `php -l` on WordPress) on the files the run changed and saves the output to the evidence folder.
+- If `<evidence>/gate-gave-up.txt` exists, a builder returned with the code check still failing, or a stop gate gave up. The run closes as blocked; quote the file in your final message.
+- Brief: `status: review` (or `blocked`), `run_ended:`, `blocked_minutes:` and `queued_minutes:` (section 8), and the review note linked under `## Run log`.
+- Task: `status: review` (or `in-progress` on a halt or block), with `brief:` pointing back at the brief.
+- Repo: the run branch is committed and **not pushed**. Name it in the run log. Leave the worktree in place for Ben's review; he removes it (`git worktree remove`) when he's merged or dropped the branch.
+- Last, write `<evidence>/closing` with one word: `review` or `blocked`, matching the brief. Until this file exists the stop hook lets every turn end, since you end turns mid-run to wait on helpers. Once it exists, `review` holds the run open until there is a verdict, a screenshot and a passing code check, and either word lets the hook remove the session's Auto marker, so a session Ben resumes later is a normal one. A check that couldn't run (exit 3) doesn't hold the run; quote its output like any other.
+- Your final message, the one Ben opens from the notification, quotes the code check's output as printed and each ticket's last verdict table as the checker returned it. Paste them; don't summarize them.
 
 ## 7. Notify
 

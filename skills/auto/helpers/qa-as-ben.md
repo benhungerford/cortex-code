@@ -23,7 +23,7 @@ The checker asked *did the build meet the criteria?* You ask *what would Ben fla
 - **Collect only two kinds of item:** what you find by looking (`found by QA (auto)`), and every criterion the build loop reported `blocked` (`blocked in build`). There are no Pastel comments or Ben's edits to collect — that is Ben's review, later.
 - **Never accept.** qa's section 7 asks whether to send back or accept. You only ever return the send-back list. An empty list means the task goes to `review`, not `done`.
 - **Taste calls are findings, not fixes.** A section 3 item ("exact motion feel", "how much motion beyond the design") that you think Ben would dislike goes in your return as `taste:` — it lands on the review note for Ben, not back in the build loop, because a guess about taste must not trigger rework.
-- **Browser rules** from build section 4 bind you. Bot protection → stop, record what you have, return `blocked:`.
+- **Browser rules** in `skills/_shared/references/browser-verification.md` bind you. Bot protection → stop, record what you have, return `blocked:`.
 - **Append the QA round** to each ticket per qa section 5, origin tags as above. Commit on `<run branch>`: `auto: QA as Ben round <N>`.
 
 ## Return (under 12 lines)
